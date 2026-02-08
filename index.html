@@ -33,6 +33,7 @@
   <!-- Scripts con atributos async/defer -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" async></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <style>
     /* Estilos críticos inline para evitar problemas de carga */
@@ -546,6 +547,7 @@
 
   <div class="mt-1">
     <p id="editStatus" class="inline-flex px-2.5 py-1 rounded-full bg-white/10 text-[10px] font-black uppercase tracking-widest text-gray-200">Modo Vista</p>
+    <p id="cloudStatus" class="inline-flex ml-2 px-2.5 py-1 rounded-full bg-white/10 text-[10px] font-black uppercase tracking-widest text-gray-200">Nube: OFF</p>
   </div>
 </div>
 
@@ -584,12 +586,12 @@
   </div>
 
   <div class="p-4 space-y-3">
-    <div id="authStatusLine" class="w-full p-3 bg-white/5 rounded-2xl text-[10px] font-bold text-gray-200">🔒 Sin sesión</div>
     <button onclick="openProfilesModal(); closeMenu();" class="w-full p-3 bg-white/10 hover:bg-white/15 rounded-2xl font-black uppercase text-[11px]">👤 Perfiles</button>
     <button onclick="openImportModal(); closeMenu();" class="w-full p-3 bg-sky-600 hover:bg-sky-700 rounded-2xl font-black uppercase text-[11px]">📥 Importar</button>
     <button onclick="showExportModal(); closeMenu();" class="w-full p-3 bg-white/10 hover:bg-white/15 rounded-2xl font-black uppercase text-[11px]">📋 Exportar</button>
-    <button id="authMenuBtn" onclick="openAuthModal(); closeMenu();" class="w-full p-3 bg-white/10 hover:bg-white/15 rounded-2xl font-black uppercase text-[11px]">🔑 Iniciar sesión</button>
     <button id="unlockBtn" onclick="toggleEditMode(); closeMenu();" class="w-full p-3 bg-emerald-600 hover:bg-emerald-700 rounded-2xl font-black uppercase text-[11px]">🔒 Bloquear</button>
+    <button id="cloudAuthBtn" onclick="openAuthModalFromMenu(); closeMenu();" class="w-full p-3 bg-white/10 hover:bg-white/15 rounded-2xl font-black uppercase text-[11px]">☁️ Iniciar sesión</button>
+    <button id="cloudSyncBtn" onclick="manualSyncNow(); closeMenu();" class="w-full p-3 bg-indigo-600 hover:bg-indigo-700 rounded-2xl font-black uppercase text-[11px] hidden">🔄 Sincronizar ahora</button>
 
     <div class="pt-3 border-t border-white/10">
       <div class="text-[10px] text-gray-300 font-bold leading-4">
@@ -1122,55 +1124,6 @@
   </div>
 </div>
 
-
-<!-- Modal Auth (Preparado para sincronización en la nube) -->
-<div id="authModal" class="modal">
-  <div class="bg-white w-full max-w-md rounded-3xl md:rounded-[40px] p-4 md:p-6 lg:p-8 shadow-2xl mx-2 max-h-[85vh] overflow-y-auto overscroll-contain">
-    <div class="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-600 mx-auto mb-4 flex items-center justify-center">
-      <span class="text-white text-2xl font-black">🔑</span>
-    </div>
-    <h3 class="font-black text-center uppercase text-base md:text-lg mb-2">Inicio de sesión</h3>
-    <p class="text-[11px] text-gray-500 font-bold text-center mb-6">
-      Esto habilitará la sincronización entre dispositivos cuando conectemos el servicio en la nube.
-    </p>
-
-    <div id="authSignedOut" class="space-y-4">
-      <div>
-        <label class="text-[12px] font-black uppercase text-gray-600">Correo o usuario</label>
-        <input id="authIdentifier" type="text" class="w-full mt-1 p-3 rounded-2xl border-2 border-gray-200 focus:border-violet-500 outline-none font-bold text-[12px]" placeholder="correo@dominio.com o usuario"/>
-      </div>
-      <div>
-        <label class="text-[12px] font-black uppercase text-gray-600">Contraseña</label>
-        <input id="authPassword" type="password" class="w-full mt-1 p-3 rounded-2xl border-2 border-gray-200 focus:border-violet-500 outline-none font-bold text-[12px]" placeholder="••••••••"/>
-      </div>
-
-      <div class="flex gap-2">
-        <button onclick="closeAuthModal()" class="flex-1 p-3 bg-gray-100 hover:bg-gray-200 rounded-2xl font-black uppercase text-[11px]">Cancelar</button>
-        <button onclick="authSignIn()" class="flex-1 p-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white rounded-2xl font-black uppercase text-[11px]">Ingresar</button>
-      </div>
-
-      <div class="text-[10px] text-gray-500 font-bold leading-4">
-        * Por ahora los datos siguen guardándose localmente. Luego conectaremos un proveedor para sincronizar en la nube.
-      </div>
-    </div>
-
-    <div id="authSignedIn" class="hidden space-y-4">
-      <div class="p-3 rounded-2xl bg-emerald-50 border border-emerald-200">
-        <div class="text-[11px] font-black uppercase text-emerald-700">Sesión activa</div>
-        <div id="authUserLine" class="text-[12px] font-black text-emerald-900 mt-1">—</div>
-        <div class="text-[10px] font-bold text-emerald-800 mt-1">Cambios locales. Sincronización disponible cuando conectemos el servicio.</div>
-      </div>
-
-      <div class="flex gap-2">
-        <button onclick="closeAuthModal()" class="flex-1 p-3 bg-gray-100 hover:bg-gray-200 rounded-2xl font-black uppercase text-[11px]">Cerrar</button>
-        <button onclick="authSignOut()" class="flex-1 p-3 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black uppercase text-[11px]">Cerrar sesión</button>
-      </div>
-    </div>
-
-    <div id="authError" class="hidden mt-4 p-3 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-[11px] font-bold"></div>
-  </div>
-</div>
-
 <!-- Modal Export -->
 <div id="exportModal" class="modal">
   <div class="bg-white w-full max-w-xl rounded-3xl md:rounded-[40px] p-4 md:p-6 lg:p-8 shadow-2xl mx-2">
@@ -1414,167 +1367,9 @@ try{
 function saveDB(){ 
   try {
     localStorage.setItem('shifter_v23', JSON.stringify(db));
-    // Sync opcional (se habilitará cuando conectemos proveedor en la nube)
-    scheduleCloudSave();
   } catch (e) {
     console.error('Error guardando DB:', e);
   }
-
-// =========================================================
-// Auth + Cloud Sync (SCaffold - listo para conectar proveedor)
-// =========================================================
-const AUTH_STORAGE_KEY = 'shifter_auth_v1';
-
-let auth = {
-  user: null, // { id, identifier, createdAt }
-};
-
-// Adaptador de nube (placeholder). En la siguiente fase lo conectaremos a un servicio real.
-// Para habilitarlo: CloudAdapter.enabled = true y definir sus métodos.
-const CloudAdapter = {
-  enabled: false,
-  async signIn(identifier, password){ throw new Error('Sin proveedor de nube configurado.'); },
-  async signOut(){ return true; },
-  async load(userId){ throw new Error('Sin proveedor de nube configurado.'); },
-  async save(userId, payload){ throw new Error('Sin proveedor de nube configurado.'); },
-};
-window.ShifterCloud = CloudAdapter;
-
-// Debounce para guardado en la nube (cuando se habilite)
-let _cloudSaveTimer = null;
-
-function loadAuth(){
-  try{
-    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-    auth.user = raw ? JSON.parse(raw) : null;
-  }catch(e){
-    auth.user = null;
-  }
-  refreshAuthUI();
-}
-
-function persistAuth(){
-  try{
-    if(auth.user) localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(auth.user));
-    else localStorage.removeItem(AUTH_STORAGE_KEY);
-  }catch(e){}
-}
-
-function refreshAuthUI(){
-  const line = document.getElementById('authStatusLine');
-  const btn  = document.getElementById('authMenuBtn');
-  const so   = document.getElementById('authSignedOut');
-  const si   = document.getElementById('authSignedIn');
-  const userLine = document.getElementById('authUserLine');
-
-  const signedIn = !!(auth && auth.user && auth.user.identifier);
-
-  if(line){
-    line.textContent = signedIn ? `✅ Sesión: ${auth.user.identifier}` : '🔒 Sin sesión';
-  }
-  if(btn){
-    btn.textContent = signedIn ? '👤 Cuenta / Sesión' : '🔑 Iniciar sesión';
-  }
-  if(so && si){
-    if(signedIn){
-      so.classList.add('hidden');
-      si.classList.remove('hidden');
-      if(userLine) userLine.textContent = auth.user.identifier;
-    }else{
-      si.classList.add('hidden');
-      so.classList.remove('hidden');
-      if(userLine) userLine.textContent = '—';
-    }
-  }
-}
-
-function openAuthModal(){
-  const m = document.getElementById('authModal');
-  if(!m) return;
-  m.classList.add('active');
-  const err = document.getElementById('authError');
-  if(err){ err.classList.add('hidden'); err.textContent=''; }
-  refreshAuthUI();
-}
-
-
-function closeAuthModal(){
-  const m = document.getElementById('authModal');
-  if(!m) return;
-  m.classList.remove('active');
-  // mantener consistente con otros modales (usa hidden y/o active según tu CSS)
-  setTimeout(()=>{ m.classList.add('hidden'); }, 150);
-}
-
-async function authSignIn(){
-  const idEl = document.getElementById('authIdentifier');
-  const pwEl = document.getElementById('authPassword');
-  const err  = document.getElementById('authError');
-
-  const identifier = (idEl && idEl.value ? idEl.value : '').trim();
-  const password = (pwEl && pwEl.value ? pwEl.value : '').trim();
-
-  if(!identifier){
-    if(err){ err.textContent='Debes ingresar correo o usuario.'; err.classList.remove('hidden'); }
-    return;
-  }
-  if(!password){
-    if(err){ err.textContent='Debes ingresar contraseña.'; err.classList.remove('hidden'); }
-    return;
-  }
-
-  // Por ahora: sesión local (scaffold). Cuando conectemos el proveedor, usaremos CloudAdapter.signIn().
-  try{
-    if(CloudAdapter.enabled){
-      const user = await CloudAdapter.signIn(identifier, password);
-      auth.user = user || { id: identifier, identifier, createdAt: Date.now() };
-    }else{
-      auth.user = { id: identifier.toLowerCase(), identifier, createdAt: Date.now() };
-    }
-    persistAuth();
-    refreshAuthUI();
-    // Preparado para: pull inicial desde nube (cuando se habilite)
-    // await cloudPull();
-  }catch(e){
-    if(err){ err.textContent = (e && e.message) ? e.message : 'Error al iniciar sesión.'; err.classList.remove('hidden'); }
-    return;
-  }
-}
-
-async function authSignOut(){
-  const err  = document.getElementById('authError');
-  try{
-    if(CloudAdapter.enabled){
-      await CloudAdapter.signOut();
-    }
-    auth.user = null;
-    persistAuth();
-    refreshAuthUI();
-  }catch(e){
-    if(err){ err.textContent = (e && e.message) ? e.message : 'Error al cerrar sesión.'; err.classList.remove('hidden'); }
-  }
-}
-
-function scheduleCloudSave(){
-  // NO cambia el comportamiento actual si no hay proveedor habilitado o no hay sesión.
-  if(!CloudAdapter.enabled) return;
-  if(!(auth && auth.user && auth.user.id)) return;
-
-  try{
-    if(_cloudSaveTimer) clearTimeout(_cloudSaveTimer);
-    _cloudSaveTimer = setTimeout(async ()=>{
-      try{
-        const payload = JSON.parse(JSON.stringify(db)); // snapshot simple
-        await CloudAdapter.save(auth.user.id, payload);
-      }catch(e){
-        console.warn('Cloud save falló:', e);
-      }
-    }, 900);
-  }catch(e){}
-}
-
-// (Opcional futuro)
-// async function cloudPull(){ ... }  // cargar DB desde nube y mezclar
 }
 
 // =========================================================
@@ -3091,9 +2886,6 @@ document.addEventListener('scroll', ()=>hideDayMenu(), true);
 window.addEventListener('resize', ()=>hideDayMenu());
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  // Auth (scaffold)
-  loadAuth();
-
   const c1 = document.getElementById('actCopyDay');
   const c2 = document.getElementById('actCopyShift');
   const p  = document.getElementById('actPaste');
@@ -5353,6 +5145,376 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// =========================================================
+// Supabase Auth + Sync (Email/Password)
+// =========================================================
+const SUPABASE_URL = "https://ojouaamtwblluhjkijlq.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qb3VhYW10d2JsbHVoamtpamxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA1MTU3ODcsImV4cCI6MjA4NjA5MTc4N30.CYfCdnNZyMa8PZJEfgE-E4dZ80FEftmYcPHBwPqbkkg";
+
+let sb = null;
+let sbUser = null;
+let sbSession = null;
+let cloudDebounceTimer = null;
+
+function getDeviceId(){
+  try{
+    const k='shifter_device_id';
+    let v = localStorage.getItem(k);
+    if(!v){
+      v = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ('dev_'+Math.random().toString(16).slice(2));
+      localStorage.setItem(k, v);
+    }
+    return v;
+  }catch(e){ return 'dev_unknown'; }
+}
+
+function markLocalUpdated(){
+  try{
+    db._meta = db._meta || {};
+    db._meta.updated_at = new Date().toISOString();
+    db._meta.device_id = getDeviceId();
+  }catch(e){}
+}
+
+function initSupabase(){
+  try{
+    if(!window.supabase || !window.supabase.createClient){
+      console.warn("Supabase SDK no cargó.");
+      return;
+    }
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
+
+    sb.auth.getSession().then(({data, error})=>{
+      if(error) console.warn(error);
+      sbSession = data?.session || null;
+      sbUser = sbSession?.user || null;
+      refreshCloudUI();
+      if(sbUser) smartInitialSync();
+    });
+
+    sb.auth.onAuthStateChange((event, session)=>{
+      sbSession = session || null;
+      sbUser = session?.user || null;
+      refreshCloudUI();
+      if(sbUser){
+        smartInitialSync();
+      }
+    });
+  }catch(e){
+    console.error("initSupabase error:", e);
+  }
+}
+
+function refreshCloudUI(){
+  const cloudStatus = document.getElementById('cloudStatus');
+  const cloudAuthBtn = document.getElementById('cloudAuthBtn');
+  const cloudSyncBtn = document.getElementById('cloudSyncBtn');
+
+  if(cloudStatus){
+    cloudStatus.textContent = sbUser ? `Nube: ON (${(sbUser.email||'').toLowerCase()})` : 'Nube: OFF';
+  }
+  if(cloudAuthBtn){
+    cloudAuthBtn.textContent = sbUser ? '☁️ Cuenta / Sesión' : '☁️ Iniciar sesión';
+  }
+  if(cloudSyncBtn){
+    cloudSyncBtn.classList.toggle('hidden', !sbUser);
+  }
+
+  // Modal buttons
+  const logoutBtn = document.getElementById('authLogoutBtn');
+  const btnPull = document.getElementById('btnPull');
+  const btnPush = document.getElementById('btnPush');
+  if(logoutBtn) logoutBtn.classList.toggle('hidden', !sbUser);
+  if(btnPull) btnPull.classList.toggle('hidden', !sbUser);
+  if(btnPush) btnPush.classList.toggle('hidden', !sbUser);
+
+  // primary label based on tab + session
+  if(document.getElementById('authPrimaryBtn')){
+    setAuthTab(currentAuthTab || 'login');
+  }
+}
+
+function openAuthModalFromMenu(){
+  openAuthModal();
+}
+
+function openAuthModal(){
+  const m = document.getElementById('authModal');
+  if(!m) return;
+  m.classList.add('active');
+  setAuthTab('login');
+  // precargar email si existe
+  const email = document.getElementById('authEmail');
+  if(email && sbUser?.email) email.value = sbUser.email;
+  setAuthMessage('');
+}
+
+function closeAuthModal(){
+  const m = document.getElementById('authModal');
+  if(!m) return;
+  m.classList.remove('active');
+}
+
+let currentAuthTab = 'login';
+function setAuthTab(tab){
+  currentAuthTab = tab;
+  const tLogin = document.getElementById('authTabLogin');
+  const tSignup = document.getElementById('authTabSignup');
+  const tReset = document.getElementById('authTabReset');
+  const passBox = document.getElementById('authPassBox');
+  const passBox2 = document.getElementById('authPassBox2');
+  const primary = document.getElementById('authPrimaryBtn');
+
+  if(tLogin && tSignup && tReset){
+    const activeCls = "bg-white shadow";
+    tLogin.className = tLogin.className.replace(activeCls,'').trim();
+    tSignup.className = tSignup.className.replace(activeCls,'').trim();
+    tReset.className = tReset.className.replace(activeCls,'').trim();
+
+    // reset base
+    [tLogin,tSignup,tReset].forEach(b=>{
+      b.classList.remove('bg-white','shadow');
+      b.classList.add('text-gray-600');
+    });
+
+    if(tab==='login'){ tLogin.classList.add('bg-white','shadow'); tLogin.classList.remove('text-gray-600'); }
+    if(tab==='signup'){ tSignup.classList.add('bg-white','shadow'); tSignup.classList.remove('text-gray-600'); }
+    if(tab==='reset'){ tReset.classList.add('bg-white','shadow'); tReset.classList.remove('text-gray-600'); }
+  }
+
+  if(passBox){
+    passBox.classList.toggle('hidden', tab==='reset');
+  }
+  if(passBox2){
+    passBox2.classList.toggle('hidden', tab!=='signup');
+  }
+
+  if(primary){
+    if(sbUser){
+      primary.textContent = 'Listo';
+      primary.onclick = () => closeAuthModal();
+    }else{
+      if(tab==='login') primary.textContent='Iniciar sesión';
+      if(tab==='signup') primary.textContent='Crear cuenta';
+      if(tab==='reset') primary.textContent='Enviar correo';
+    }
+  }
+}
+
+function setAuthMessage(msg, isError=false){
+  const el = document.getElementById('authMsg');
+  if(!el) return;
+  el.textContent = msg || '';
+  el.classList.toggle('text-red-600', !!isError);
+  el.classList.toggle('text-gray-600', !isError);
+}
+
+async function authPrimaryAction(){
+  if(sbUser){ closeAuthModal(); return; }
+  if(!sb) return setAuthMessage("Supabase no está disponible (verifica conexión).", true);
+
+  const email = (document.getElementById('authEmail')?.value || '').trim();
+  const pass = (document.getElementById('authPassword')?.value || '');
+  const pass2 = (document.getElementById('authPassword2')?.value || '');
+
+  if(!email) return setAuthMessage("Correo requerido.", true);
+
+  try{
+    setAuthMessage("Procesando...");
+    if(currentAuthTab==='login'){
+      if(!pass) return setAuthMessage("Contraseña requerida.", true);
+      const {data, error} = await sb.auth.signInWithPassword({ email, password: pass });
+      if(error) return setAuthMessage(error.message, true);
+      sbSession = data.session; sbUser = data.user;
+      setAuthMessage("Sesión iniciada. Sincronizando...");
+      await smartInitialSync();
+      setAuthMessage("Sesión iniciada y sincronizada.");
+      refreshCloudUI();
+    }else if(currentAuthTab==='signup'){
+      if(!pass || pass.length < 6) return setAuthMessage("Contraseña mínima: 6 caracteres.", true);
+      if(pass !== pass2) return setAuthMessage("La confirmación no coincide.", true);
+      const {data, error} = await sb.auth.signUp({ email, password: pass });
+      if(error) return setAuthMessage(error.message, true);
+      // Si email confirmations están activos, session puede ser null
+      if(data.session){
+        sbSession = data.session; sbUser = data.user;
+        setAuthMessage("Cuenta creada e iniciada. Sincronizando...");
+        await smartInitialSync();
+        setAuthMessage("Cuenta creada y sincronizada.");
+      }else{
+        setAuthMessage("Cuenta creada. Revisa tu correo para confirmar e inicia sesión.", false);
+      }
+      refreshCloudUI();
+    }else if(currentAuthTab==='reset'){
+      const {data, error} = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+      if(error) return setAuthMessage(error.message, true);
+      setAuthMessage("Correo enviado. Revisa tu bandeja.", false);
+    }
+  }catch(e){
+    console.error(e);
+    setAuthMessage(String(e.message || e), true);
+  }
+}
+
+async function logoutSupabase(){
+  if(!sb) return;
+  try{
+    await sb.auth.signOut();
+    sbUser = null; sbSession=null;
+    refreshCloudUI();
+    setAuthMessage("Sesión cerrada.");
+  }catch(e){
+    setAuthMessage("No se pudo cerrar sesión: " + (e.message||e), true);
+  }
+}
+
+function isCloudEnabled(){
+  return !!sbUser && !!sb;
+}
+
+// IMPORTANT: La tabla esperada en Supabase:
+// public.shifter_state (user_id uuid unique, data jsonb, updated_at timestamptz default now)
+async function pullFromCloud(){
+  if(!isCloudEnabled()) throw new Error("No hay sesión en la nube.");
+  const {data, error} = await sb
+    .from('shifter_state')
+    .select('data, updated_at')
+    .eq('user_id', sbUser.id)
+    .maybeSingle();
+  if(error) throw error;
+  return data || null;
+}
+
+async function pushToCloud(){
+  if(!isCloudEnabled()) throw new Error("No hay sesión en la nube.");
+  markLocalUpdated();
+  const payload = {
+    user_id: sbUser.id,
+    data: db,
+    updated_at: new Date().toISOString()
+  };
+  const {error} = await sb
+    .from('shifter_state')
+    .upsert(payload, { onConflict: 'user_id' });
+  if(error) throw error;
+}
+
+async function smartInitialSync(){
+  if(!isCloudEnabled()) return;
+
+  // Asegurar meta local
+  db._meta = db._meta || {};
+  const localTS = db._meta.updated_at ? Date.parse(db._meta.updated_at) : 0;
+
+  const row = await pullFromCloud();
+  if(!row){
+    // primer push
+    await pushToCloud();
+    return;
+  }
+
+  const cloudTS = row.updated_at ? Date.parse(row.updated_at) : 0;
+
+  if(cloudTS > localTS){
+    // nube más reciente: reemplazar local
+    db = row.data || db;
+    // mantener compatibilidad: asegurar estructura mínima
+    try{
+      // Re-guardar y re-render
+      saveDB(); // también marca meta
+      safeInitAfterCloudReplace();
+    }catch(e){ console.error(e); }
+  }else if(localTS > cloudTS){
+    // local más reciente: subir
+    await pushToCloud();
+  }else{
+    // iguales: nada
+  }
+}
+
+function safeInitAfterCloudReplace(){
+  // Cuando llega desde nube, puede faltar algo por migraciones; reusar funciones de compatibilidad existentes.
+  try{
+    // Re-crear selects y re-render
+    populateUserSelect();
+    render();
+    updateSummary();
+    renderSettings();
+    renderCategories();
+    renderLocalities();
+    renderHolidays();
+  }catch(e){
+    console.error("safeInitAfterCloudReplace:", e);
+    try{ render(); }catch(_){}
+  }
+}
+
+function scheduleCloudPush(){
+  if(!isCloudEnabled()) return;
+  if(cloudDebounceTimer) clearTimeout(cloudDebounceTimer);
+  cloudDebounceTimer = setTimeout(async ()=>{
+    try{
+      await pushToCloud();
+      // opcional: feedback silencioso
+    }catch(e){
+      console.warn("Cloud push failed:", e);
+    }
+  }, 1500);
+}
+
+async function manualSyncNow(){
+  if(!isCloudEnabled()){
+    openAuthModal();
+    return;
+  }
+  try{
+    await smartInitialSync();
+    alert("Sincronización completada.");
+  }catch(e){
+    alert("Error sincronizando: " + (e.message||e));
+  }
+}
+
+async function pullFromCloudUI(){
+  if(!isCloudEnabled()) return openAuthModal();
+  try{
+    const row = await pullFromCloud();
+    if(!row){ return alert("No hay datos en la nube aún."); }
+    if(!confirm("Esto reemplazará tus datos locales por los de la nube. ¿Continuar?")) return;
+    db = row.data || db;
+    saveDB();
+    safeInitAfterCloudReplace();
+    alert("Datos de la nube aplicados.");
+  }catch(e){
+    alert("Error: " + (e.message||e));
+  }
+}
+
+async function pushToCloudUI(){
+  if(!isCloudEnabled()) return openAuthModal();
+  try{
+    await pushToCloud();
+    alert("Datos enviados a la nube.");
+  }catch(e){
+    alert("Error: " + (e.message||e));
+  }
+}
+
+// Hook: extender saveDB para también programar push a nube (si hay sesión)
+const _origSaveDB = saveDB;
+saveDB = function(){
+  try{ markLocalUpdated(); }catch(e){}
+  _origSaveDB();
+  scheduleCloudPush();
+};
+
+// Iniciar supabase al cargar
+window.addEventListener('load', () => {
+  initSupabase();
+});
 </script>
 
 
@@ -5365,6 +5527,58 @@ document.addEventListener('DOMContentLoaded', () => {
     <button id="actPaste" class="w-full text-left px-4 py-3 hover:bg-gray-50 font-bold">📥 Pegar</button>
     <button id="actPasteMode" class="w-full text-left px-4 py-3 hover:bg-gray-50 font-bold">🖱️ Modo pegar: OFF</button>
     <button id="actClear" class="w-full text-left px-4 py-3 hover:bg-gray-50 font-bold text-red-600">🧹 Limpiar portapapeles</button>
+  </div>
+</div>
+
+<!-- Modal Auth (Supabase) -->
+<div id="authModal" class="modal">
+  <div class="bg-white w-full max-w-md rounded-3xl md:rounded-[40px] overflow-hidden shadow-2xl border border-gray-100 mx-2">
+    <div class="bg-gradient-to-r from-indigo-600 to-sky-600 text-white text-center py-4 font-black text-sm uppercase tracking-widest relative">
+      <div>☁️ Sincronización en la Nube</div>
+      <div id="authSub" class="text-[10px] font-normal opacity-90 mt-1">Inicia sesión con correo y contraseña</div>
+      <button type="button" onclick="closeAuthModal()" aria-label="Cerrar" class="absolute top-3 right-3 w-10 h-10 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/25 flex items-center justify-center text-white text-xl leading-none">✕</button>
+    </div>
+
+    <div class="p-4 md:p-6 space-y-4">
+      <div class="flex bg-gray-100 p-1.5 rounded-2xl">
+        <button id="authTabLogin" type="button" onclick="setAuthTab('login')" class="flex-1 py-3 rounded-xl font-black text-[11px] uppercase transition-all bg-white shadow">Iniciar sesión</button>
+        <button id="authTabSignup" type="button" onclick="setAuthTab('signup')" class="flex-1 py-3 rounded-xl font-black text-[11px] uppercase transition-all text-gray-600">Crear cuenta</button>
+        <button id="authTabReset" type="button" onclick="setAuthTab('reset')" class="flex-1 py-3 rounded-xl font-black text-[11px] uppercase transition-all text-gray-600">Recuperar</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="text-[11px] font-bold text-gray-600 block mb-2">Correo</label>
+          <input id="authEmail" type="email" placeholder="tu@correo.com" autocomplete="email" class="w-full bg-gray-50 border-gray-200">
+        </div>
+
+        <div id="authPassBox">
+          <label class="text-[11px] font-bold text-gray-600 block mb-2">Contraseña</label>
+          <input id="authPassword" type="password" placeholder="••••••••" autocomplete="current-password" class="w-full bg-gray-50 border-gray-200">
+        </div>
+
+        <div id="authPassBox2" class="hidden">
+          <label class="text-[11px] font-bold text-gray-600 block mb-2">Confirmar contraseña</label>
+          <input id="authPassword2" type="password" placeholder="••••••••" autocomplete="new-password" class="w-full bg-gray-50 border-gray-200">
+        </div>
+
+        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-3 text-[10px] font-bold text-blue-900">
+          La nube guarda y sincroniza toda tu información: perfiles, turnos, categorías, asuetos, fotos y notas.
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <button id="authPrimaryBtn" type="button" onclick="authPrimaryAction()" class="w-full p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black uppercase text-[11px]">Iniciar sesión</button>
+          <button id="authLogoutBtn" type="button" onclick="logoutSupabase()" class="w-full p-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl font-black uppercase text-[11px] hidden">Cerrar sesión</button>
+        </div>
+
+        <div class="text-[11px] font-bold text-center text-gray-600" id="authMsg"></div>
+
+        <div class="border-t pt-3 flex gap-2">
+          <button type="button" onclick="pullFromCloudUI()" class="flex-1 p-3 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl font-black uppercase text-[10px] hidden" id="btnPull">⬇️ Traer nube</button>
+          <button type="button" onclick="pushToCloudUI()" class="flex-1 p-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black uppercase text-[10px] hidden" id="btnPush">⬆️ Enviar nube</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
