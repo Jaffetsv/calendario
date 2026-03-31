@@ -3,6 +3,12 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Shifter Pro">
+  <meta name="theme-color" content="#1e293b">
+  <link rel="apple-touch-icon" id="appTouchIcon" href="">
+  <link rel="manifest" id="pwaManifest" href="">
   <title>Shifter Pro v23 - Calendario de Turnos</title>
   
   <!-- CDNs con fallback -->
@@ -270,6 +276,10 @@
       display: none;
     }
     
+    .view-section.view-active {
+      display: block !important;
+    }
+    
     .view-active {
       display: block !important;
     }
@@ -523,102 +533,432 @@
     .drawer.active{ transform: translateX(0); }
     .drawer a, .drawer button{ text-align:left; }
 
+    /* === REDISEÑO UX === */
+
+    /* Barra superior más delgada */
+    #topBar { padding: 10px 12px 8px; }
+
+    /* Dot de estado de sincronización */
+    .sync-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      flex-shrink: 0; cursor: pointer;
+      transition: background 0.3s;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.15);
+    }
+    .sync-dot.offline  { background: #6b7280; }
+    .sync-dot.synced   { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.3); }
+    .sync-dot.pending  { background: #f59e0b; animation: pulse-dot 1.2s infinite; }
+    .sync-dot.error    { background: #ef4444; }
+
+    @keyframes pulse-dot {
+      0%,100% { opacity:1; } 50% { opacity:0.4; }
+    }
+
+    /* Tabs en la parte inferior (más móvil) */
+    #bottomTabs {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      background: #ffffff;
+      border-top: 1px solid #e5e7eb;
+      z-index: 200;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+    }
+    .btab {
+      position: relative;
+      flex: 1;
+      min-height: 64px;
+      padding: 9px 6px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 900;
+      color: #94a3b8;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.18s ease, transform 0.18s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .btab .btab-icon {
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btab .btab-icon svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+    .btab .btab-line {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 3px;
+      border-radius: 999px;
+      background: transparent;
+      transition: background 0.18s ease, width 0.18s ease;
+    }
+    .btab.btab-active { color: #2563eb; }
+    .btab.btab-active .btab-line { background: #2563eb; width: 28px; }
+
+    /* Espacio para el tab bar inferior */
+    body { padding-bottom: 68px; }
+
+    /* Encabezado de días de la semana */
+    #weekHeader .wday {
+      padding: 11px 4px;
+      font-size: 11px;
+      font-weight: 900;
+      color: #6b7280;
+      background: #ffffff;
+    }
+    #weekHeader .wday-sat {
+      color: #2563eb;
+    }
+    #weekHeader .wday-sun {
+      color: #dc2626;
+    }
+
+    /* Celdas del calendario: notas más legibles */
+    .note-text {
+      font-size: 11px !important;
+      font-weight: 800 !important;
+      padding: 4px 6px !important;
+      border-radius: 6px !important;
+      background: rgba(255,255,255,0.95) !important;
+      border: 1px solid rgba(0,0,0,0.10) !important;
+      margin: 4px 4px 6px !important;
+      width: calc(100% - 8px) !important;
+      line-height: 1.25 !important;
+      color: #111827 !important;
+      box-shadow: none !important;
+      word-break: break-word !important;
+    }
+
+    @media (max-width: 480px) {
+      .note-text { font-size: 9px !important; }
+    }
+
+    /* Turno label más legible */
+    .shift-label {
+      font-size: 14px !important;
+      font-weight: 900 !important;
+      letter-spacing: 0.02em;
+    }
+    @media (max-width: 480px) {
+      .shift-label { font-size: 10px !important; }
+    }
+
+    /* Número del día: más visible */
+    .day-number {
+      font-size: 11px !important;
+      font-weight: 900 !important;
+      background: rgba(255,255,255,0.88) !important;
+      border-bottom-left-radius: 6px !important;
+    }
+    .today .day-number {
+      background: #2563eb !important;
+      color: #fff !important;
+    }
+
+    /* Banner de conflicto entre dispositivos: más visible */
+    #cloudUpdateBanner {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+      border: 1px solid rgba(255,255,255,0.15) !important;
+    }
+
+    /* Navegación de mes */
+    #monthNav {
+      background: #1e3a5f !important;
+      border-radius: 22px !important;
+      box-shadow: 0 14px 28px rgba(30,58,95,0.20);
+      min-height: 96px;
+    }
+    .month-nav-btn {
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.10);
+      color: #ffffff;
+      cursor: pointer;
+      transition: background 0.18s ease, transform 0.18s ease;
+      flex-shrink: 0;
+    }
+    .month-nav-btn:hover { background: rgba(255,255,255,0.16); }
+    .month-nav-btn svg { width: 19px; height: 19px; display: block; }
+    #currentMonthLabel,
+.month-picker-trigger {
+      border: none;
+      background: transparent;
+      color: #ffffff;
+      padding: 0;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+      vertical-align: middle;
+    }
+    .month-picker-trigger:focus-visible {
+      outline: 2px solid rgba(255,255,255,0.45);
+      outline-offset: 4px;
+      border-radius: 10px;
+    }
+    #currentYearLabel {
+      font-size: 13px;
+      line-height: 1;
+      font-weight: 800;
+      color: rgba(255,255,255,0.68);
+      letter-spacing: 0.04em;
+    }
+    .month-year-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      flex-wrap: nowrap;
+    }
+    .month-year-sep {
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 900;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+    .month-today-btn {
+      border: none;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      color: #ffffff;
+      padding: 4px 10px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.18s ease;
+    }
+    .month-today-btn:hover { background: rgba(255,255,255,0.22); }
+
+    @media (max-width: 640px) {
+      #view-calendar {
+        min-height: calc(100vh - 210px);
+      }
+      .calendar-grid {
+        grid-auto-rows: minmax(132px, 1fr);
+      }
+      .day-cell {
+        min-height: 132px !important;
+      }
+      #bottomTabs {
+        min-height: 66px;
+      }
+    }
+
+    /* Ajuste del calendario para que todos los días quepan sin espacio sobrante */
+    #view-calendar {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    #weekHeader {
+      flex: 0 0 auto;
+    }
+    #calendar {
+      flex: 1 1 auto;
+      min-height: 0;
+      align-content: stretch;
+      grid-auto-rows: var(--calendar-row-height, 1fr);
+    }
+    .day-cell {
+      min-height: var(--calendar-row-height, 1fr) !important;
+      height: var(--calendar-row-height, auto);
+    }
+
+    /* Ocultar tabs viejos (reemplazados por bottom tabs) */
+    #oldTabBar { display: none !important; }
+
   </style>
 </head>
 
 <body class="bg-gray-100">
 
-<!-- Top bar -->
-<div class="bg-[#1e293b] text-white px-3 md:px-4 py-2 sticky top-0 z-50 shadow-lg">
-  <div class="flex items-center gap-3">
-    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center font-black text-sm flex-shrink-0" aria-hidden="true">
+<!-- Top bar (rediseñado: 1 fila compacta) -->
+<div id="topBar" class="bg-[#1e293b] text-white px-3 py-2 sticky top-0 z-50 shadow-lg">
+  <div class="flex items-center gap-2">
+
+    <!-- Dot de sync: tap para abrir cuenta -->
+    <button id="syncDotBtn" onclick="openAuthModalFromMenu()" title="Estado de sincronización" aria-label="Sincronización" class="flex-shrink-0 p-1">
+      <span id="syncDot" class="sync-dot offline block"></span>
+    </button>
+
+    <!-- Inicial del usuario -->
+    <div class="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center font-black text-[11px] flex-shrink-0" aria-hidden="true">
       <span id="userInitial">A</span>
     </div>
 
-    <!-- Perfil: ocupa la barra completa para evitar espacios desperdiciados -->
+    <!-- Selector de perfil -->
     <select id="userSelect" onchange="switchUser()"
-      class="flex-1 min-w-0 bg-white text-gray-900 border border-white/20 rounded-xl px-3 py-2 text-[12px] md:text-[13px] font-black">
+      class="flex-1 min-w-0 bg-transparent text-white border border-white/20 rounded-xl px-2 py-1.5 text-[12px] font-black appearance-none">
     </select>
 
-    <button id="menuBtn" onclick="toggleMenu()" class="bg-white/15 hover:bg-white/25 p-3 rounded-xl text-[12px] font-black uppercase transition-colors flex-shrink-0" aria-label="Menú">
-      ☰
-    </button>
+    <!-- Modo edición dot -->
+    <span id="editDot" title="Modo vista — toca el menú para activar edición" class="w-2.5 h-2.5 rounded-full bg-gray-500 flex-shrink-0"></span>
+
+    <!-- Menú hamburguesa -->
+    <button id="menuBtn" onclick="toggleMenu()" class="bg-white/15 hover:bg-white/25 w-9 h-9 rounded-xl text-[18px] transition-colors flex-shrink-0 flex items-center justify-center" aria-label="Menú">☰</button>
   </div>
 
-  <div class="mt-1">
-    <p id="editStatus" class="inline-flex px-2.5 py-1 rounded-full bg-white/10 text-[10px] font-black uppercase tracking-widest text-gray-200">Modo Vista</p>
-    <p id="cloudStatus" class="inline-flex ml-2 px-2.5 py-1 rounded-full bg-white/10 text-[10px] font-black uppercase tracking-widest text-gray-200">Nube: OFF</p>
+  <!-- Estado de sync + edición -->
+  <div id="statusMetaRow" class="hidden mt-1 pl-8 pr-1 flex items-center gap-2 min-w-0">
+    <span id="syncStatusBar" class="min-w-0 truncate text-[9px] font-bold text-gray-400"></span>
+    <span id="editPill" class="hidden shrink-0 rounded-full border border-emerald-400/25 bg-emerald-500/15 px-2 py-[2px] text-[9px] font-black uppercase tracking-wide text-emerald-300">Edición</span>
   </div>
+
+  <!-- Indicadores legacy (hidden, mantenidos para compatibilidad con JS) -->
+  <p id="editStatus" class="hidden">Modo Vista</p>
+  <p id="cloudStatus" class="hidden">Nube: OFF</p>
 </div>
 
-<!-- Month/year (compacto, protagonista: calendario) -->
-<div class="px-3 md:px-4 pt-2">
-  <div class="flex items-center justify-between bg-gradient-to-r from-blue-900 to-slate-800 rounded-2xl px-2 py-2 shadow-inner">
-    <button onclick="changeMonth(-1)" class="p-2 md:p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors flex-shrink-0" aria-label="Mes anterior">
-      <span class="text-2xl md:text-3xl font-black text-white">‹</span>
+<!-- Month/year nav: compacto y protagonista -->
+<div class="px-2 pt-1.5 pb-0">
+  <div id="monthNav" class="flex items-center justify-between gap-2 rounded-[22px] px-3 py-2">
+    <button onclick="changeMonth(-1)" class="month-nav-btn" aria-label="Mes anterior">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.5 5.5L8 12l6.5 6.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
 
-    <div class="flex flex-col items-center flex-1 mx-2 min-w-0">
-      <div id="currentMonthDisplay" class="hidden text-lg md:text-2xl font-black text-white text-center leading-tight truncate">Febrero 2026</div>
-      <div class="mt-1 flex flex-col items-center gap-2 opacity-95">
-        <div class="flex items-center gap-2">
-          <select id="selectMonth" onchange="jumpToDate()" class="bg-transparent border-none p-0 text-lg md:text-xl font-black text-white text-center appearance-none cursor-pointer"></select>
-          <span class="text-white font-black">/</span>
-          <select id="selectYear" onchange="jumpToDate()" class="bg-transparent border-none p-0 text-lg md:text-xl font-black text-white text-center appearance-none cursor-pointer"></select>
-        </div>
-        <button onclick="goToday()" class="px-4 py-1.5 bg-white/20 hover:bg-white/30 rounded-full text-[10px] md:text-[11px] font-black uppercase transition-colors">Hoy</button>
+    <div class="flex flex-1 min-w-0 flex-col items-center justify-center text-center">
+      <div class="month-year-row">
+        <button type="button" id="monthTriggerBtn" class="month-picker-trigger truncate" onclick="openMonthPicker()" aria-label="Seleccionar mes">
+          <span id="currentMonthLabel" class="truncate" style="color:#ffffff;font-weight:900;font-size:24px;line-height:1;display:inline-block;">Marzo</span>
+        </button>
+        <span class="month-year-sep" aria-hidden="true">/</span>
+        <button type="button" id="yearTriggerBtn" class="month-picker-trigger" onclick="openYearPicker()" aria-label="Seleccionar año">
+          <span id="currentYearLabel" style="color:#ffffff;font-weight:900;font-size:24px;line-height:1;display:inline-block;">2026</span>
+        </button>
+      </div>
+      <div class="mt-1 flex items-center justify-center">
+        <button onclick="goToday()" class="month-today-btn">Hoy</button>
+      </div>
+      <div id="currentMonthDisplay" class="hidden"></div>
+      <div class="hidden">
+        <select id="selectMonth" onchange="jumpToDate()"></select>
+        <select id="selectYear" onchange="jumpToDate()"></select>
       </div>
     </div>
 
-    <button onclick="changeMonth(1)" class="p-2 md:p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors flex-shrink-0" aria-label="Mes siguiente">
-      <span class="text-2xl md:text-3xl font-black text-white">›</span>
+    <button onclick="changeMonth(1)" class="month-nav-btn" aria-label="Mes siguiente">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9.5 5.5L16 12l-6.5 6.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </div>
 </div>
 
 
-<!-- Drawer menu -->
+<!-- Drawer menu (rediseñado) -->
 <div id="menuOverlay" class="drawer-overlay" onclick="closeMenu()"></div>
 <div id="menuDrawer" class="drawer" role="dialog" aria-modal="true" aria-label="Menú">
-  <div class="p-4 border-b border-white/10 flex items-center justify-between">
-    <div class="font-black uppercase text-[12px] tracking-widest">Acciones</div>
-    <button onclick="closeMenu()" class="bg-white/15 hover:bg-white/25 px-3 py-2 rounded-xl text-[10px] font-black uppercase">Cerrar</button>
+
+  <!-- Header del drawer -->
+  <div class="p-4 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+    <div>
+      <div class="font-black uppercase text-[13px] tracking-widest">Shifter Pro</div>
+      <div id="drawerSyncLine" class="text-[10px] text-gray-400 font-bold mt-0.5">Sin sesión de nube</div>
+    </div>
+    <button onclick="closeMenu()" class="bg-white/15 hover:bg-white/25 w-9 h-9 rounded-xl text-[18px] flex items-center justify-center">✕</button>
   </div>
 
-  <div class="p-4 space-y-3">
-    <button onclick="openProfilesModal(); closeMenu();" class="w-full p-3 bg-white/10 hover:bg-white/15 rounded-2xl font-black uppercase text-[11px]">👤 Perfiles</button>
-    <button onclick="openImportModal(); closeMenu();" class="w-full p-3 bg-sky-600 hover:bg-sky-700 rounded-2xl font-black uppercase text-[11px]">📥 Importar</button>
-    <button onclick="showExportModal(); closeMenu();" class="w-full p-3 bg-white/10 hover:bg-white/15 rounded-2xl font-black uppercase text-[11px]">📋 Exportar</button>
-    <button id="unlockBtn" onclick="toggleEditMode(); closeMenu();" class="w-full p-3 bg-emerald-600 hover:bg-emerald-700 rounded-2xl font-black uppercase text-[11px]">🔒 Bloquear</button>
-    <button id="cloudAuthBtn" onclick="openAuthModalFromMenu(); closeMenu();" class="w-full p-3 bg-white/10 hover:bg-white/15 rounded-2xl font-black uppercase text-[11px]">☁️ Iniciar sesión</button>
-    <button id="cloudSyncBtn" onclick="manualSyncNow(); closeMenu();" class="w-full p-3 bg-indigo-600 hover:bg-indigo-700 rounded-2xl font-black uppercase text-[11px] hidden">🔄 Sincronizar ahora</button>
+  <!-- Contenido scrollable -->
+  <div class="flex-1 overflow-y-auto p-4 space-y-2">
 
-    <div class="pt-3 border-t border-white/10">
-      <div class="text-[10px] text-gray-300 font-bold leading-4">
-        * Recomendación: agrega este sitio a tu pantalla de inicio desde el navegador del teléfono.
-      </div>
+    <!-- SINCRONIZACIÓN (la más importante) -->
+    <div class="bg-white/5 rounded-2xl p-3 mb-2">
+      <div class="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-2">Sincronización</div>
+      <button id="cloudAuthBtn" onclick="openAuthModalFromMenu(); closeMenu();" class="w-full p-3 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-black text-[11px] mb-2">☁️ Iniciar sesión en la nube</button>
+      <button id="cloudSyncBtn" onclick="manualSyncNow(); closeMenu();" class="w-full p-3 bg-indigo-500 hover:bg-indigo-600 rounded-xl font-black text-[11px] hidden">🔄 Sincronizar ahora</button>
+    </div>
+
+    <!-- EDICIÓN -->
+    <div class="bg-white/5 rounded-2xl p-3 mb-2">
+      <div class="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-2">Modo edición</div>
+      <button id="unlockBtn" onclick="toggleEditMode(); closeMenu();" class="w-full p-3 bg-emerald-600 hover:bg-emerald-700 rounded-xl font-black text-[11px]">🔒 Bloquear / Desbloquear</button>
+    </div>
+
+    <!-- DATOS -->
+    <div class="bg-white/5 rounded-2xl p-3 mb-2">
+      <div class="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-2">Datos</div>
+      <button onclick="openProfilesModal(); closeMenu();" class="w-full p-3 bg-white/10 hover:bg-white/15 rounded-xl font-black text-[11px] mb-2">👤 Perfiles de usuario</button>
+      <button onclick="openImportModal(); closeMenu();" class="w-full p-3 bg-sky-700 hover:bg-sky-800 rounded-xl font-black text-[11px] mb-2">📥 Importar Excel</button>
+      <button onclick="showExportModal(); closeMenu();" class="w-full p-3 bg-white/10 hover:bg-white/15 rounded-xl font-black text-[11px]">📋 Exportar calendario</button>
+    </div>
+
+  </div>
+
+  <!-- Pie del drawer -->
+  <div class="p-4 border-t border-white/10 flex-shrink-0">
+    <div class="text-[10px] text-gray-500 font-bold text-center">
+      Agrega esta página a tu pantalla de inicio para usarla como app.
     </div>
   </div>
+
 </div>
 
-<!-- Tabs -->
-
-<div class="flex bg-white shadow-sm border-b">
+<!-- Tabs superiores (ocultos, compatibilidad con JS) -->
+<div id="oldTabBar" class="hidden">
   <button onclick="showView('calendar')" id="tab-calendar" class="tab-btn tab-active">📅 Calendario</button>
   <button onclick="showView('summary')" id="tab-summary" class="tab-btn">📊 Resumen</button>
   <button onclick="showView('settings')" id="tab-settings" class="tab-btn">⚙️ Ajustes</button>
 </div>
 
+<!-- Tabs inferiores (nuevos, mobile-first) -->
+<div id="bottomTabs">
+  <button class="btab btab-active" id="btab-calendar" onclick="showView('calendar')">
+    <span class="btab-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 3.5V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16.5 3.5V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3.5 9.5H20.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </span>
+    <span>Calendario</span>
+    <span class="btab-line" aria-hidden="true"></span>
+  </button>
+  <button class="btab" id="btab-summary" onclick="showView('summary')">
+    <span class="btab-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4.5 19.5H19.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M7.5 17V11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 17V7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16.5 17V13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </span>
+    <span>Resumen</span>
+    <span class="btab-line" aria-hidden="true"></span>
+  </button>
+  <button class="btab" id="btab-settings" onclick="showView('settings')">
+    <span class="btab-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 8.7a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.2a1 1 0 0 0 .2 1.1l.1.1a1.9 1.9 0 0 1-2.7 2.7l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V18a1.9 1.9 0 1 1-3.8 0v-.2a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a1.9 1.9 0 0 1-2.7-2.7l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H6a1.9 1.9 0 1 1 0-3.8h.2a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a1.9 1.9 0 0 1 2.7-2.7l.1.1a1 1 0 0 0 1.1.2h.1a1 1 0 0 0 .5-.9V6a1.9 1.9 0 1 1 3.8 0v.2a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a1.9 1.9 0 1 1 2.7 2.7l-.1.1a1 1 0 0 0-.2 1.1v.1a1 1 0 0 0 .9.5h.2a1.9 1.9 0 1 1 0 3.8h-.2a1 1 0 0 0-.9.6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    </span>
+    <span>Ajustes</span>
+    <span class="btab-line" aria-hidden="true"></span>
+  </button>
+</div>
+
 <!-- Calendar -->
 <div id="view-calendar" class="view-section view-active">
-  <div class="grid grid-cols-7 text-center text-[11px] font-black py-3 bg-gradient-to-r from-blue-50 to-gray-50 text-gray-600 border-b">
-    <div class="text-blue-600 font-black">LUN</div>
-    <div>MAR</div>
-    <div>MIÉ</div>
-    <div>JUE</div>
-    <div>VIE</div>
-    <div class="text-blue-600 font-black">SÁB</div>
-    <div class="text-red-600 font-black">DOM</div>
+  <div id="weekHeader" class="grid grid-cols-7 border-b border-gray-200 bg-white text-center">
+    <div class="wday">LUN</div>
+    <div class="wday">MAR</div>
+    <div class="wday">MIÉ</div>
+    <div class="wday">JUE</div>
+    <div class="wday">VIE</div>
+    <div class="wday wday-sat">SÁB</div>
+    <div class="wday wday-sun">DOM</div>
   </div>
   <div id="calendar" class="calendar-grid"></div>
 </div>
@@ -928,8 +1268,8 @@
                   <div id="shiftPreviewTitle" class="font-black text-[16px] text-gray-900 mt-1">—</div>
                 </div>
                 <div class="flex flex-col gap-2 w-[220px] max-w-[52vw]">
-  <button id="btnOpenTurnPicker" type="button" class="w-full rounded-xl bg-white border border-black/10 px-3 py-2 font-black text-[12px] text-gray-800">🎯 Asignar / cambiar turno</button>
-  <button id="btnClearShift" type="button" class="w-full rounded-xl bg-gray-100 border border-black/10 px-3 py-2 font-black text-[12px] text-gray-700">🧽 Vaciar turno</button>
+  <button id="btnOpenTurnPicker" type="button" class="w-full rounded-xl bg-blue-600 hover:bg-blue-700 px-3 py-2.5 font-black text-[12px] text-white shadow-sm">🎯 Cambiar turno</button>
+  <button id="btnClearShift" type="button" class="w-full rounded-xl bg-gray-100 hover:bg-red-50 border border-red-200 px-3 py-2.5 font-black text-[12px] text-red-600">🧹 Vaciar día</button>
 </div>
                 <div class="flex gap-2 hidden">
                   <button id="btnCopyThisDay" type="button" class="rounded-xl bg-white border border-black/10 px-3 py-2 font-bold text-[12px]">📋 Copiar</button>
@@ -1174,6 +1514,59 @@
       <button onclick="closeExportModal()" class="w-full mt-2 p-3 text-gray-400 font-bold uppercase text-[10px] hover:text-gray-600">
         Cancelar
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Fusionar Perfiles -->
+<div id="mergeProfilesModal" class="modal">
+  <div class="bg-white w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl border border-gray-100 mx-2" style="max-height:90vh;overflow-y:auto;">
+    <div class="bg-[#1e3a5f] text-white px-5 py-4 flex items-center justify-between">
+      <div>
+        <div class="font-black text-[13px] uppercase tracking-widest">🔗 Fusionar perfiles</div>
+        <div class="text-[11px] text-white/70 mt-0.5">Une dos perfiles en uno solo, conservando todos los meses</div>
+      </div>
+      <button onclick="closeMergeModal()" class="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-lg flex-shrink-0">✕</button>
+    </div>
+    <div class="p-5 space-y-4">
+
+      <div>
+        <div class="text-[10px] font-black uppercase text-gray-500 mb-1">Perfil origen (será eliminado)</div>
+        <select id="mergeSourceSel" onchange="renderMergePreview()" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-[12px] font-bold text-gray-900"></select>
+      </div>
+
+      <div class="text-center text-gray-400 text-lg select-none">⬇ se fusiona hacia ⬇</div>
+
+      <div>
+        <div class="text-[10px] font-black uppercase text-gray-500 mb-1">Perfil destino (el que permanece)</div>
+        <select id="mergeTargetSel" onchange="renderMergePreview()" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-[12px] font-bold text-gray-900"></select>
+      </div>
+
+      <div>
+        <div class="text-[10px] font-black uppercase text-gray-500 mb-1">Nombre final del perfil fusionado</div>
+        <select id="mergeKeepNameSel" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-[12px] font-bold text-gray-900"></select>
+      </div>
+
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3">
+        <div class="text-[10px] font-black uppercase text-amber-800 mb-2">Cuando un mismo día tiene datos en ambos perfiles</div>
+        <div class="space-y-1.5">
+          <label class="flex items-center gap-2 text-[11px] font-bold text-gray-700 cursor-pointer">
+            <input type="radio" name="mergeConflict" value="target" checked> Conservar los del perfil destino
+          </label>
+          <label class="flex items-center gap-2 text-[11px] font-bold text-gray-700 cursor-pointer">
+            <input type="radio" name="mergeConflict" value="source"> Conservar los del perfil origen
+          </label>
+        </div>
+      </div>
+
+      <div id="mergePreview" class="bg-gray-50 border border-gray-200 rounded-2xl p-3 text-[11px] font-bold text-gray-600">
+        Selecciona dos perfiles para ver el resumen.
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="closeMergeModal()" class="flex-1 p-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-[11px] font-black uppercase">Cancelar</button>
+        <button onclick="executeMerge()" class="flex-1 p-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase">🔗 Fusionar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1880,16 +2273,22 @@ function updateMonthDisplay(){
   const m = current.getMonth();
   const display = document.getElementById('currentMonthDisplay');
   if (display) display.textContent = `${MONTHS[m]} ${y}`;
-  
+
+  const monthLabel = document.getElementById('currentMonthLabel');
+  const yearLabel = document.getElementById('currentYearLabel');
+  if (monthLabel) monthLabel.textContent = MONTHS[m];
+  if (yearLabel) yearLabel.textContent = y;
+
   const monthSelect = document.getElementById('selectMonth');
   const yearSelect = document.getElementById('selectYear');
   if (monthSelect) monthSelect.value = m;
   if (yearSelect) yearSelect.value = y;
 }
 
-function changeMonth(v){ 
-  current.setMonth(current.getMonth() + v); 
-  updateMonthDisplay(); 
+function changeMonth(v){
+  // Usar new Date(y, m, 1) para evitar overflow cuando el día actual es 29-31
+  current = new Date(current.getFullYear(), current.getMonth() + v, 1);
+  updateMonthDisplay();
   render();
   renderSummaryCategories();
   calcSummary();
@@ -1899,9 +2298,8 @@ function jumpToDate(){
   const monthSelect = document.getElementById('selectMonth');
   const yearSelect = document.getElementById('selectYear');
   if (monthSelect && yearSelect) {
-    current.setMonth(parseInt(monthSelect.value));
-    current.setFullYear(parseInt(yearSelect.value));
-    updateMonthDisplay(); 
+    current = new Date(parseInt(yearSelect.value), parseInt(monthSelect.value), 1);
+    updateMonthDisplay();
     render();
     renderSummaryCategories();
     calcSummary();
@@ -1916,34 +2314,56 @@ function goToday(){
   calcSummary();
 }
 
+function openMonthPicker(){
+  const el = document.getElementById('selectMonth');
+  if(!el) return;
+  if(typeof el.showPicker === 'function'){
+    try{ el.showPicker(); return; }catch(e){}
+  }
+  el.focus();
+  el.click();
+}
+
+function openYearPicker(){
+  const el = document.getElementById('selectYear');
+  if(!el) return;
+  if(typeof el.showPicker === 'function'){
+    try{ el.showPicker(); return; }catch(e){}
+  }
+  el.focus();
+  el.click();
+}
+
 // =========================================================
 // View Management
 // =========================================================
-function showView(v){
-  // Ocultar todas las vistas
-  document.querySelectorAll('.view-section').forEach(s => {
-    s.classList.remove('view-active');
+function showView(view){
+  const valid = ['calendar','summary','settings'];
+  const target = valid.includes(view) ? view : 'calendar';
+
+  document.querySelectorAll('.view-section').forEach(el => {
+    el.classList.remove('view-active');
+    el.style.display = 'none';
   });
-  
-  // Quitar active de todas las tabs
-  document.querySelectorAll('.tab-btn').forEach(b => {
-    b.classList.remove('tab-active');
-  });
-  
-  // Mostrar vista seleccionada
-  const viewElement = document.getElementById(`view-${v}`);
-  const tabElement = document.getElementById(`tab-${v}`);
-  
-  if (viewElement) viewElement.classList.add('view-active');
-  if (tabElement) tabElement.classList.add('tab-active');
-  
-  if(v === 'summary'){
-    renderSummaryCategories();
-    calcSummary();
+
+  const activeView = document.getElementById('view-' + target);
+  if (activeView) {
+    activeView.classList.add('view-active');
+    activeView.style.display = 'block';
   }
-  
-  if(v === 'settings'){
-    updateUIEditMode();
+
+  document.querySelectorAll('#bottomTabs .btab').forEach(btn => btn.classList.remove('btab-active'));
+  const activeBtn = document.getElementById('btab-' + target);
+  if (activeBtn) activeBtn.classList.add('btab-active');
+
+  document.querySelectorAll('#oldTabBar .tab-btn').forEach(btn => btn.classList.remove('tab-active'));
+  const oldBtn = document.getElementById('tab-' + target);
+  if (oldBtn) oldBtn.classList.add('tab-active');
+
+  if (target === 'calendar') {
+    requestAnimationFrame(() => {
+      if (typeof fitCalendarToViewport === 'function') fitCalendarToViewport();
+    });
   }
 }
 
@@ -2022,20 +2442,34 @@ function updateUIEditMode(){
   
   if (!configContent || !lockedMessage || !editStatus || !unlockBtn) return;
   
-  if(isEditMode()){
+  const editing = isEditMode();
+
+  if(editing){
     configContent.classList.remove('hidden');
     lockedMessage.classList.add('hidden');
-    editStatus.textContent = "MODO EDICIÓN ACTIVADO";
-    editStatus.className = "text-[10px] font-black uppercase text-emerald-400";
+    editStatus.textContent = "Edición";
+    editStatus.className = "hidden";
     unlockBtn.textContent = "🔒 Bloquear";
     unlockBtn.className = "bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-colors";
   } else {
     configContent.classList.add('hidden');
     lockedMessage.classList.remove('hidden');
-    editStatus.textContent = "MODO VISTA";
-    editStatus.className = "text-[10px] font-black uppercase text-gray-400";
+    editStatus.textContent = "Vista";
+    editStatus.className = "hidden";
     unlockBtn.textContent = "🔓 Editar";
     unlockBtn.className = "bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-colors";
+  }
+
+  // Dot de modo edición en top bar
+  const editDot = document.getElementById('editDot');
+  if(editDot){
+    editDot.style.background = editing ? '#22c55e' : '#6b7280';
+    editDot.title = editing ? 'Modo edición activo' : 'Modo vista — edición bloqueada';
+  }
+
+  const editPill = document.getElementById('editPill');
+  if(editPill){
+    editPill.classList.toggle('hidden', !editing);
   }
 }
 
@@ -2102,6 +2536,34 @@ function switchUser(){
 // =========================================================
 // Calendar Rendering
 // =========================================================
+
+function fitCalendarToViewport(){
+  const view = document.getElementById('view-calendar');
+  const grid = document.getElementById('calendar');
+  const weekHeader = document.getElementById('weekHeader');
+  const bottomTabs = document.getElementById('bottomTabs');
+  if (!view || !grid || !weekHeader || !bottomTabs) return;
+
+  const totalCells = grid.children.length;
+  const rows = Math.max(1, Math.ceil(totalCells / 7));
+  const viewportH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+
+  const viewTop = view.getBoundingClientRect().top;
+  const weekHeaderH = weekHeader.getBoundingClientRect().height || 0;
+  const bottomTabsH = bottomTabs.getBoundingClientRect().height || 0;
+
+  const available = Math.floor(viewportH - viewTop - weekHeaderH - bottomTabsH - 8);
+  if (available <= 0) return;
+
+  const rowGap = 1;
+  const totalGaps = Math.max(0, rows - 1) * rowGap;
+  const rowHeight = Math.max(68, Math.floor((available - totalGaps) / rows));
+  const gridHeight = rows * rowHeight + totalGaps;
+
+  document.documentElement.style.setProperty('--calendar-row-height', rowHeight + 'px');
+  document.documentElement.style.setProperty('--calendar-grid-height', gridHeight + 'px');
+}
+
 function render(){
   const grid = document.getElementById('calendar');
   if (!grid) return;
@@ -2155,6 +2617,8 @@ function render(){
     const cell = createDayCell(i, true, null, SHIFTS, user, key);
     grid.appendChild(cell);
   }
+
+  requestAnimationFrame(fitCalendarToViewport);
 }
 
 function createDayCell(dayNum, isOffMonth, info, SHIFTS, user, key, isToday = false){
@@ -2192,9 +2656,10 @@ let suppressClickUntil = 0;
       }
     } else {
       const shift = SHIFTS[info.s] || {color: 'L', label: 'L'};
+      const noteText = (info.n || '').toString().trim();
       cell.innerHTML = `<div class="shift-label ${shiftBgClass(shift.color)}" style="${shiftBgStyle(shift.color)}">${escapeHTML(shift.label)}</div>`;
-      if (info.n) {
-        cell.innerHTML += `<div class="note-text">${escapeHTML(info.n)}</div>`;
+      if (noteText) {
+        cell.innerHTML += `<div class="note-text">${escapeHTML(noteText)}</div>`;
       }
     }
   } else {
@@ -2220,7 +2685,9 @@ let suppressClickUntil = 0;
   cell.onclick = (ev) => {
     if (wasLongPress) { wasLongPress = false; return; }
     if (!isEditMode()) {
-      alert("Activa modo edición para editar.");
+      // Mostrar toast más amigable en lugar de alert
+      if(typeof toast === 'function') toast('🔒 Activa el modo edición desde el menú ☰');
+      else alert("Activa modo edición desde el menú ☰");
       return;
     }
     // Si está activo el modo pegar, pegar sin abrir modal
@@ -3923,59 +4390,96 @@ function createProfile(){
 function renderProfilesList(){
   const container = document.getElementById('profilesList');
   if (!container) return;
-  
+
   container.innerHTML = '';
-  
+
+  // --- Alertas de perfiles similares ---
+  const similar = detectSimilarProfiles();
+  if(similar.length){
+    let warn = `<div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 mb-3">
+      <div class="font-black text-[11px] text-amber-800 mb-2">⚠️ Perfiles posiblemente duplicados:</div>`;
+    similar.forEach(p => {
+      warn += `<div class="flex items-center justify-between gap-2 mb-1 flex-wrap">
+        <span class="text-[10px] text-amber-900 font-bold">"${escapeHTML(p.a)}" ↔ "${escapeHTML(p.b)}"
+          <span class="text-amber-600">(${escapeHTML(p.reason)})</span>
+        </span>
+        <button onclick="openMergeModal(${JSON.stringify(p.a)})"
+          class="px-2 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[9px] font-black uppercase flex-shrink-0">
+          🔗 Fusionar
+        </button>
+      </div>`;
+    });
+    warn += '</div>';
+    container.innerHTML += warn;
+  }
+
+  // --- Tarjetas de perfil ---
+  const MN = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   const keys = Object.keys(db.users).sort();
-  
+
   keys.forEach(u => {
     const user = db.users[u];
     const isCurrent = (u === db.current);
-    
+
+    // Resumen de meses con datos
+    const months = _profileMonthSet(u);
+    const monthCount = months.size;
+    const monthSummary = monthCount === 0
+      ? '<span class="text-gray-400">Sin datos</span>'
+      : [...months].sort().slice(-3).map(ym => {
+          const [y,m] = ym.split('-');
+          return `${MN[parseInt(m)-1]}&nbsp;${y}`;
+        }).join(' · ') + (monthCount > 3 ? ` <span class="text-gray-400">+${monthCount-3} más</span>` : '');
+
     container.innerHTML += `
       <div class="border border-gray-200 rounded-2xl p-3 ${isCurrent ? 'bg-blue-50 border-blue-200' : ''}">
-        <div class="flex items-center justify-between gap-2">
-          <div>
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
             <div class="font-black text-gray-900 text-[12px]">
-              ${escapeHTML(u)} ${isCurrent ? '<span class="ml-2 text-[9px] font-black text-blue-600">(Actual)</span>' : ''}
+              ${escapeHTML(u)}${isCurrent ? ' <span class="text-[9px] font-black text-blue-600">(Actual)</span>' : ''}
             </div>
-            <div class="text-[10px] font-bold text-gray-500">
-              Localidad: <span class="font-black text-gray-800">${escapeHTML(user.locality || 'San Salvador')}</span>
+            <div class="text-[10px] font-bold text-gray-500 mt-0.5">
+              📍 ${escapeHTML(user.locality || 'San Salvador')}
+              &nbsp;·&nbsp; 📅 ${monthSummary}
             </div>
           </div>
-          <div class="flex gap-2">
-            <button onclick="setCurrentProfile('${u}')" class="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-[10px] font-black uppercase">
-              Usar
-            </button>
+          <div class="flex gap-1.5 flex-wrap justify-end flex-shrink-0">
+            <button onclick="setCurrentProfile(${JSON.stringify(u)})"
+              class="px-2 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-[10px] font-black uppercase">Usar</button>
             ${u === 'ADMIN' ? '' : `
-              <button onclick="deleteProfile('${u}')" class="px-3 py-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 text-[10px] font-black uppercase">
-                Eliminar
-              </button>
+              <button onclick="openMergeModal(${JSON.stringify(u)})"
+                class="px-2 py-1.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 text-[10px] font-black uppercase">🔗</button>
+              <button onclick="deleteProfile(${JSON.stringify(u)})"
+                class="px-2 py-1.5 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 text-[10px] font-black uppercase">✕</button>
             `}
           </div>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">
           <div class="md:col-span-2">
             <div class="text-[9px] font-black text-gray-400 uppercase mb-1">Renombrar perfil</div>
-            <input id="p-name-${cssSafe(u)}" value="${escapeHTML(u)}" class="w-full bg-white border-gray-200 focus:border-blue-400 rounded-xl text-gray-900" ${u === 'ADMIN' ? 'disabled' : ''}/>
+            <input id="p-name-${cssSafe(u)}" value="${escapeHTML(u)}"
+              class="w-full bg-white border-gray-200 focus:border-blue-400 rounded-xl text-gray-900"
+              ${u === 'ADMIN' ? 'disabled' : ''}/>
           </div>
           <div>
             <div class="text-[9px] font-black text-gray-400 uppercase mb-1">PIN</div>
-            <input id="p-pin-${cssSafe(u)}" value="${escapeHTML(user.pin || '0000')}" maxlength="4" class="w-full bg-white border-gray-200 focus:border-blue-400 rounded-xl text-gray-900"/>
+            <input id="p-pin-${cssSafe(u)}" value="${escapeHTML(user.pin || '0000')}" maxlength="4"
+              class="w-full bg-white border-gray-200 focus:border-blue-400 rounded-xl text-gray-900"/>
           </div>
           <div class="md:col-span-3">
             <div class="text-[9px] font-black text-gray-400 uppercase mb-1">Localidad</div>
             <select id="p-loc-${cssSafe(u)}" class="w-full bg-white border-gray-200 focus:border-blue-400 rounded-xl text-gray-900">
               ${db.localities
                 .filter(l => l.toUpperCase() !== 'GENERAL')
-                .map(l => `<option value="${escapeHTML(l)}" ${(user.locality || 'San Salvador') === l ? 'selected' : ''}>${escapeHTML(l)}</option>`)
+                .map(l => `<option value="${escapeHTML(l)}" ${(user.locality||'San Salvador')===l?'selected':''}>${escapeHTML(l)}</option>`)
                 .join('')}
             </select>
           </div>
           <div class="md:col-span-3">
-            <button onclick="saveProfileEdits('${u}')" class="w-full p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase text-[11px]">
-              💾 Guardar cambios de este perfil
+            <button onclick="saveProfileEdits(${JSON.stringify(u)})"
+              class="w-full p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase text-[11px]">
+              💾 Guardar cambios
             </button>
           </div>
         </div>
@@ -4043,6 +4547,171 @@ function saveProfileEdits(u){
   renderProfilesList();
   render();
   alert("Perfil actualizado.");
+}
+
+// =========================================================
+// Profile Merge Functions
+// =========================================================
+
+function detectSimilarProfiles(){
+  const users = Object.keys(db.users);
+  const pairs = [];
+  for(let i = 0; i < users.length; i++){
+    for(let j = i+1; j < users.length; j++){
+      const a = users[i], b = users[j];
+      const na = normalizeName(a), nb = normalizeName(b);
+      if(na === nb){
+        pairs.push({a, b, reason: 'Mismo nombre (diferente acentuación)'});
+      } else {
+        const aw = na.split(' ').filter(w => w.length > 2);
+        const bw = nb.split(' ').filter(w => w.length > 2);
+        if(aw.length === 0 || bw.length === 0) continue;
+        const common = aw.filter(w => bw.includes(w)).length;
+        const score = common / Math.max(aw.length, bw.length);
+        if(score >= 0.7){
+          pairs.push({a, b, reason: `${Math.round(score*100)}% de palabras coinciden`});
+        }
+      }
+    }
+  }
+  return pairs;
+}
+
+function _profileMonthSet(userKey){
+  const user = db.users[userKey];
+  const months = new Set();
+  Object.keys(user?.data || {}).forEach(k => {
+    const p = k.split('-');
+    if(p.length >= 2) months.add(`${p[0]}-${String(parseInt(p[1])).padStart(2,'0')}`);
+  });
+  return months;
+}
+
+function openMergeModal(sourceUser){
+  if(!isEditMode()) return alert("Activa modo edición.");
+  const modal = document.getElementById('mergeProfilesModal');
+  if(!modal) return;
+
+  const users = Object.keys(db.users).sort();
+  const sourceSel = document.getElementById('mergeSourceSel');
+  const targetSel = document.getElementById('mergeTargetSel');
+
+  sourceSel.innerHTML = users.map(u =>
+    `<option value="${escapeHTML(u)}" ${u === sourceUser ? 'selected':''}>${escapeHTML(u)}</option>`
+  ).join('');
+
+  // Default target: first user that is not the source
+  const defaultTarget = users.find(u => u !== sourceUser) || '';
+  targetSel.innerHTML = users.map(u =>
+    `<option value="${escapeHTML(u)}" ${u === defaultTarget ? 'selected':''}>${escapeHTML(u)}</option>`
+  ).join('');
+
+  renderMergePreview();
+  modal.classList.add('active');
+}
+
+function closeMergeModal(){
+  const modal = document.getElementById('mergeProfilesModal');
+  if(modal) modal.classList.remove('active');
+}
+
+function _updateMergeKeepNameSelect(){
+  const src = document.getElementById('mergeSourceSel')?.value;
+  const tgt = document.getElementById('mergeTargetSel')?.value;
+  const keepSel = document.getElementById('mergeKeepNameSel');
+  if(!keepSel) return;
+  const opts = [tgt, src].filter(Boolean).filter((v,i,a) => a.indexOf(v) === i);
+  keepSel.innerHTML = opts.map(u => `<option value="${escapeHTML(u)}">${escapeHTML(u)}</option>`).join('');
+}
+
+function renderMergePreview(){
+  const src = document.getElementById('mergeSourceSel')?.value;
+  const tgt = document.getElementById('mergeTargetSel')?.value;
+  const preview = document.getElementById('mergePreview');
+  _updateMergeKeepNameSelect();
+
+  if(!src || !tgt || src === tgt){
+    if(preview) preview.innerHTML = '<span class="text-amber-600 font-bold">Selecciona dos perfiles distintos.</span>';
+    return;
+  }
+  if(!db.users[src] || !db.users[tgt]){
+    if(preview) preview.innerHTML = '<span class="text-red-600 font-bold">Perfil no encontrado.</span>';
+    return;
+  }
+
+  const srcMonths = _profileMonthSet(src);
+  const tgtMonths = _profileMonthSet(tgt);
+  const allMonths = [...new Set([...srcMonths, ...tgtMonths])].sort();
+  const conflicts = allMonths.filter(m => srcMonths.has(m) && tgtMonths.has(m));
+  const srcOnly   = allMonths.filter(m => srcMonths.has(m) && !tgtMonths.has(m));
+  const tgtOnly   = allMonths.filter(m => !srcMonths.has(m) && tgtMonths.has(m));
+  const MN = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const fmt = ym => { const [y,m] = ym.split('-'); return `${MN[parseInt(m)-1]} ${y}`; };
+
+  let html = '<div class="space-y-2">';
+  html += `<div class="font-black text-gray-800">Resumen de fusión:</div>`;
+  html += '<div class="text-[10px] space-y-1 leading-relaxed">';
+  if(srcOnly.length)   html += `<div>📥 Solo en <b>${escapeHTML(src)}</b>: ${srcOnly.map(fmt).join(', ')}</div>`;
+  if(tgtOnly.length)   html += `<div>📁 Solo en <b>${escapeHTML(tgt)}</b>: ${tgtOnly.map(fmt).join(', ')}</div>`;
+  if(conflicts.length) html += `<div class="text-amber-700">⚠️ Conflicto (ambos tienen datos): ${conflicts.map(fmt).join(', ')}</div>`;
+  if(!allMonths.length) html += `<div class="text-gray-400">Ninguno de los dos tiene datos de calendario todavía.</div>`;
+  html += '</div>';
+  html += `<div class="text-[10px] text-red-600 font-bold pt-1">El perfil "<b>${escapeHTML(src)}</b>" será eliminado tras fusionar.</div>`;
+  html += '</div>';
+  if(preview) preview.innerHTML = html;
+}
+
+function executeMerge(){
+  if(!isEditMode()) return alert("Activa modo edición.");
+  const src  = document.getElementById('mergeSourceSel')?.value;
+  const tgt  = document.getElementById('mergeTargetSel')?.value;
+  const keepName = document.getElementById('mergeKeepNameSel')?.value?.trim()?.toUpperCase();
+  const conflictStrategy = document.querySelector('input[name="mergeConflict"]:checked')?.value || 'target';
+
+  if(!src || !tgt) return alert("Selecciona los perfiles.");
+  if(src === tgt)  return alert("Selecciona dos perfiles distintos.");
+  if(!db.users[src] || !db.users[tgt]) return alert("Perfil no encontrado.");
+  if(!confirm(`¿Fusionar "${src}" → "${tgt}"?\n\nEl perfil "${src}" será eliminado. Esta acción no se puede deshacer.`)) return;
+
+  const srcUser = db.users[src];
+  const tgtUser = db.users[tgt];
+
+  // Fusionar datos de calendario
+  Object.entries(srcUser.data || {}).forEach(([dateKey, dayData]) => {
+    if(conflictStrategy === 'source' || !tgtUser.data[dateKey]){
+      tgtUser.data[dateKey] = JSON.parse(JSON.stringify(dayData));
+    }
+  });
+
+  // Fusionar turnos configurados: añadir al destino los que no existan
+  Object.entries(srcUser.config || {}).forEach(([shiftKey, shiftDef]) => {
+    if(!tgtUser.config[shiftKey]){
+      tgtUser.config[shiftKey] = JSON.parse(JSON.stringify(shiftDef));
+    }
+  });
+
+  let finalName = tgt;
+
+  // Si el nombre elegido es el del origen, renombrar el destino
+  if(keepName && keepName !== tgt && keepName === src){
+    db.users[src] = tgtUser;       // copiar datos del destino al nombre del origen
+    delete db.users[tgt];
+    if(db.current === tgt) db.current = src;
+    finalName = src;
+  } else {
+    // Eliminar origen
+    delete db.users[src];
+    if(db.current === src) db.current = tgt;
+    finalName = tgt;
+  }
+
+  saveDB();
+  closeMergeModal();
+  updateUserDropdown();
+  updateUserInitial();
+  render();
+  renderProfilesList();
+  alert(`✅ Fusión completada. Perfil final: "${finalName}".`);
 }
 
 // =========================================================
@@ -4140,13 +4809,21 @@ async function analyzeImportFile(){
     // Extraer usuarios y turnos detectados
     const usersSet = new Set();
     const codesSet = new Set();
+    const nameMatchMap = {}; // importName -> existingProfileKey (si hay coincidencia fuzzy)
 
     for(let r = headerIdx + 1; r < rows.length; r++){
       const row = rows[r] || [];
       if(!isLikelyDataRow(row, nameCol, empCol, dayCols)) continue;
 
       const name = safeNameCell(row[nameCol]).toUpperCase();
-      if(name) usersSet.add(name);
+      if(name){
+        usersSet.add(name);
+        // Buscar perfil existente con coincidencia fuzzy
+        if(!db.users[name]){
+          const fuzzyMatch = findFuzzyUserMatch(name);
+          if(fuzzyMatch && fuzzyMatch !== name) nameMatchMap[name] = fuzzyMatch;
+        }
+      }
 
       for(const d of Object.keys(dayCols)){
         const code = normalizeCode(row[dayCols[d]]);
@@ -4163,7 +4840,7 @@ async function analyzeImportFile(){
     importContext = {
       wb, sheetName, rows, headerIdx, nameCol, empCol, dayCols, monthIndex0, year,
       users: Array.from(usersSet).sort(),
-      codeCatMap: {}
+      codeCatMap: {}, nameMatchMap
     };
 
     // Mostrar usuarios
@@ -4171,12 +4848,15 @@ async function analyzeImportFile(){
     if(importContext.users.length === 0){
       list.innerHTML = `<div class="text-gray-400 font-bold">No se detectaron usuarios.</div>`;
     } else {
-      list.innerHTML = importContext.users.map(u => `
+      list.innerHTML = importContext.users.map(u => {
+        const matchedProfile = nameMatchMap[u];
+        const matchLabel = matchedProfile ? ` <span style="color:#1e40af;font-size:10px;">→ usa perfil: ${escapeHTML(matchedProfile)}</span>` : '';
+        return `
         <label class="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 cursor-pointer" style="color: #111827;">
           <input class="impUserChk" type="checkbox" value="${escapeHTML(u)}" checked>
-          <span class="font-black">${escapeHTML(u)}</span>
-        </label>
-      `).join('');
+          <span class="font-black">${escapeHTML(u)}${matchLabel}</span>
+        </label>`;
+      }).join('');
     }
 
     // Mostrar mapeo de turnos -> categoría (si aplica)
@@ -4439,6 +5119,41 @@ function safeNameCell(v){
   return String(v || '').replace(/\s+/g, ' ').trim();
 }
 
+// Normalizar nombre: quitar tildes, minúsculas, colapsar espacios
+function normalizeName(name){
+  return String(name || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+// Buscar perfil existente que coincida por nombre normalizado
+function findFuzzyUserMatch(importedName){
+  const norm = normalizeName(importedName);
+  if(!norm) return null;
+  const existing = Object.keys(db.users || {});
+  // Coincidencia exacta normalizada
+  for(const uk of existing){
+    if(normalizeName(uk) === norm) return uk;
+  }
+  // Coincidencia por palabras clave (al menos 3 palabras coinciden)
+  const importWords = norm.split(' ').filter(w => w.length > 2);
+  let bestMatch = null;
+  let bestScore = 0;
+  for(const uk of existing){
+    const ukWords = normalizeName(uk).split(' ').filter(w => w.length > 2);
+    const common = importWords.filter(w => ukWords.includes(w)).length;
+    const score = common / Math.max(importWords.length, ukWords.length, 1);
+    if(score > 0.6 && score > bestScore){
+      bestScore = score;
+      bestMatch = uk;
+    }
+  }
+  return bestMatch;
+}
+
 async function analyzeImportFile(){
   const fileInput = document.getElementById('importFile');
   if(!fileInput.files || !fileInput.files[0]) {
@@ -4495,13 +5210,21 @@ async function analyzeImportFile(){
     // Extraer usuarios y turnos detectados
     const usersSet = new Set();
     const codesSet = new Set();
+    const nameMatchMap = {}; // importName -> existingProfileKey (si hay coincidencia fuzzy)
 
     for(let r = headerIdx + 1; r < rows.length; r++){
       const row = rows[r] || [];
       if(!isLikelyDataRow(row, nameCol, empCol, dayCols)) continue;
 
       const name = safeNameCell(row[nameCol]).toUpperCase();
-      if(name) usersSet.add(name);
+      if(name){
+        usersSet.add(name);
+        // Buscar perfil existente con coincidencia fuzzy
+        if(!db.users[name]){
+          const fuzzyMatch = findFuzzyUserMatch(name);
+          if(fuzzyMatch && fuzzyMatch !== name) nameMatchMap[name] = fuzzyMatch;
+        }
+      }
 
       for(const d of Object.keys(dayCols)){
         const code = normalizeCode(row[dayCols[d]]);
@@ -4518,7 +5241,7 @@ async function analyzeImportFile(){
     importContext = {
       wb, sheetName, rows, headerIdx, nameCol, empCol, dayCols, monthIndex0, year,
       users: Array.from(usersSet).sort(),
-      codeCatMap: {}
+      codeCatMap: {}, nameMatchMap
     };
 
     // Mostrar usuarios
@@ -4526,12 +5249,36 @@ async function analyzeImportFile(){
     if(importContext.users.length === 0){
       list.innerHTML = `<div class="text-gray-400 font-bold">No se detectaron usuarios.</div>`;
     } else {
-      list.innerHTML = importContext.users.map(u => `
+      list.innerHTML = importContext.users.map((u, idx) => {
+        const matchedProfile = nameMatchMap[u];
+        if(matchedProfile){
+          const radioName = `impUnify_${idx}`;
+          return `
+          <div class="p-2 rounded-xl bg-blue-50 border border-blue-200 mb-1">
+            <div class="flex items-start gap-2">
+              <input class="impUserChk mt-1 flex-shrink-0" type="checkbox" value="${escapeHTML(u)}" checked>
+              <div class="min-w-0">
+                <div class="font-black text-[11px] text-gray-900">${escapeHTML(u)}</div>
+                <div class="text-[10px] text-blue-700 font-bold mt-0.5">⚠️ Similar a perfil existente: <strong>${escapeHTML(matchedProfile)}</strong></div>
+                <div class="flex gap-4 mt-1">
+                  <label class="flex items-center gap-1 text-[10px] font-bold cursor-pointer text-blue-800">
+                    <input type="radio" name="${radioName}" value="unify" checked
+                      data-import-name="${escapeHTML(u)}" data-existing="${escapeHTML(matchedProfile)}"> Unificar con perfil existente
+                  </label>
+                  <label class="flex items-center gap-1 text-[10px] font-bold cursor-pointer text-gray-700">
+                    <input type="radio" name="${radioName}" value="new"> Crear perfil nuevo
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        }
+        return `
         <label class="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 cursor-pointer" style="color: #111827;">
           <input class="impUserChk" type="checkbox" value="${escapeHTML(u)}" checked>
           <span class="font-black">${escapeHTML(u)}</span>
-        </label>
-      `).join('');
+        </label>`;
+      }).join('');
     }
 
     // Mostrar mapeo de turnos -> categoría (si aplica)
@@ -4559,16 +5306,25 @@ function runImportSelected(){
   if(selected.length === 0) return alert("Selecciona al menos un usuario.");
   
   const { rows, headerIdx, nameCol, empCol, dayCols, monthIndex0, year } = importContext;
-  
+
+  // Resolver nombres: respetar la decisión del usuario (unificar vs crear nuevo)
+  const nameMatchMap = (importContext && importContext.nameMatchMap) || {};
+  const resolvedNames = selected.map(u => {
+    if(!nameMatchMap[u]) return u;
+    // Buscar el radio "unify" marcado para este usuario
+    const unifyRadio = document.querySelector(`input[type="radio"][data-import-name="${CSS.escape(u)}"][value="unify"]`);
+    return (unifyRadio && unifyRadio.checked) ? nameMatchMap[u] : u;
+  });
+
   // Asegurar que los usuarios existen
-  selected.forEach(u => ensureUserExists(u));
-  
-  // Limpiar mes si es modo reemplazar
+  resolvedNames.forEach(u => ensureUserExists(u));
+
+  // Limpiar mes si es modo reemplazar (usar nombres resueltos)
   if(importMode === 'replace'){
-    selected.forEach(u => {
+    resolvedNames.forEach(u => {
       const user = db.users[u];
       if (!user) return;
-      
+
       const prefix = `${year}-${monthIndex0 + 1}-`;
       Object.keys(user.data).forEach(k => {
         if(k.startsWith(prefix)) delete user.data[k];
@@ -4585,8 +5341,11 @@ function runImportSelected(){
     
     const name = safeNameCell(row[nameCol]).toUpperCase();
     if(!selected.includes(name)) continue;
-    
-    const userKey = ensureUserExists(name);
+
+    // Resolver nombre según decisión del usuario (unificar o crear nuevo)
+    const unifyRadioRow = document.querySelector(`input[type="radio"][data-import-name="${CSS.escape(name)}"][value="unify"]`);
+    const resolvedName = (nameMatchMap[name] && unifyRadioRow && unifyRadioRow.checked) ? nameMatchMap[name] : name;
+    const userKey = ensureUserExists(resolvedName);
     const user = db.users[userKey];
     if (!user) continue;
     
@@ -4609,10 +5368,21 @@ function runImportSelected(){
       ensureShiftExistsForUser(userKey, def, true);
       
       const key = dayKey(year, monthIndex0 + 1, day);
-      
+
       // Saltar si es modo merge y ya existe
       if(importMode === 'merge' && user.data[key]) continue;
-      
+
+      // Proteger meses pasados: en modo replace, no tocar meses anteriores al actual
+      {
+        const now = new Date();
+        const curY = now.getFullYear(), curM = now.getMonth() + 1;
+        const keyY = year, keyM = monthIndex0 + 1;
+        if(importMode === 'replace' && (keyY < curY || (keyY === curY && keyM < curM))){
+          // Mes pasado en modo replace: solo escribir si el día está vacío
+          if(user.data[key]) continue;
+        }
+      }
+
       // Crear entrada
       const tIn = def.in || '00:00';
       const tOut = def.out || '00:00';
@@ -4965,6 +5735,7 @@ function buildExportHTML(userKey, locality, year, monthIndex0, todayStr, catHour
       `;
     } else {
       const shift = SHIFTS[info.s] || {color: 'L', label: 'L'};
+      const noteText = (info.n || '').toString().trim();
       dayHTML = `
         <div style="height:100px;background:${getColorValue(shift.color)};position:relative;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;border:1px solid #e5e7eb;">
           ${escapeHTML(shift.label)}
@@ -4972,8 +5743,8 @@ function buildExportHTML(userKey, locality, year, monthIndex0, todayStr, catHour
             ${d}
           </div>
           ${isHoliday ? `<div style="position:absolute;top:2px;left:2px;font-size:8px;font-weight:900;color:#dc2626;background:rgba(254,226,226,0.9);padding:1px 4px;border-radius:4px;">A</div>` : ''}
-          ${info.n ? `<div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:900;background:rgba(255,255,255,0.95);padding:3px 6px;border-radius:4px;white-space:nowrap;max-width:90%;overflow:visible;border:1px solid rgba(0,0,0,0.1);">
-            ${escapeHTML(info.n)}
+          ${noteText ? `<div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:900;background:rgba(255,255,255,0.95);padding:3px 6px;border-radius:4px;white-space:nowrap;max-width:90%;overflow:visible;border:1px solid rgba(0,0,0,0.1);">
+            ${escapeHTML(noteText)}
           </div>` : ''}
         </div>
       `;
@@ -5156,6 +5927,15 @@ let sb = null;
 let sbUser = null;
 let sbSession = null;
 let cloudDebounceTimer = null;
+let cloudInitReady = false;
+let lastSyncTime = null;
+let realtimeChannel = null;
+let remoteConflictPending = false;
+let lastRemotePayload = null;
+let syncDecisionResolver = null;
+let smartSyncPromise = null;
+let cloudUploadDecisionResolver = null;
+let localCloudUploadPending = false;
 
 function getDeviceId(){
   try{
@@ -5175,6 +5955,70 @@ function markLocalUpdated(){
     db._meta.updated_at = new Date().toISOString();
     db._meta.device_id = getDeviceId();
   }catch(e){}
+}
+
+function hasMeaningfulLocalData(snapshot){
+  try{
+    if(!snapshot || !snapshot.users) return false;
+    return Object.values(snapshot.users).some(user => user && user.data && Object.keys(user.data).length > 0);
+  }catch(e){
+    return false;
+  }
+}
+
+function applyCloudDb(newDb, {clearRemotePending=true} = {}){
+  db = JSON.parse(JSON.stringify(newDb || db));
+  _origSaveDB();
+  safeInitAfterCloudReplace();
+  lastSyncTime = new Date();
+  if(clearRemotePending){
+    remoteConflictPending = false;
+    lastRemotePayload = null;
+    dismissCloudBanner();
+  }
+  localCloudUploadPending = false;
+  dismissLocalUploadBanner();
+  updateSyncStatusUI();
+}
+
+function openSyncDecisionModal(){
+  return new Promise(resolve => {
+    syncDecisionResolver = resolve;
+    const modal = document.getElementById('syncDecisionModal');
+    if(modal) modal.classList.add('active');
+  });
+}
+
+function closeSyncDecisionModal(){
+  const modal = document.getElementById('syncDecisionModal');
+  if(modal) modal.classList.remove('active');
+}
+
+function resolveSyncDecision(choice){
+  const resolver = syncDecisionResolver;
+  syncDecisionResolver = null;
+  closeSyncDecisionModal();
+  if(resolver) resolver(choice);
+}
+
+function openLocalUploadDecisionModal(){
+  return new Promise(resolve => {
+    cloudUploadDecisionResolver = resolve;
+    const modal = document.getElementById('cloudUploadDecisionModal');
+    if(modal) modal.classList.add('active');
+  });
+}
+
+function closeLocalUploadDecisionModal(){
+  const modal = document.getElementById('cloudUploadDecisionModal');
+  if(modal) modal.classList.remove('active');
+}
+
+function resolveLocalUploadDecision(choice){
+  const resolver = cloudUploadDecisionResolver;
+  cloudUploadDecisionResolver = null;
+  closeLocalUploadDecisionModal();
+  if(resolver) resolver(choice);
 }
 
 function initSupabase(){
@@ -5329,10 +6173,11 @@ async function authPrimaryAction(){
       const {data, error} = await sb.auth.signInWithPassword({ email, password: pass });
       if(error) return setAuthMessage(error.message, true);
       sbSession = data.session; sbUser = data.user;
-      setAuthMessage("Sesión iniciada. Sincronizando...");
+      setAuthMessage("Sesión iniciada. Revisando sincronización...");
       await smartInitialSync();
-      setAuthMessage("Sesión iniciada y sincronizada.");
+      setAuthMessage(localCloudUploadPending ? "Sesión iniciada. Tus cambios quedaron locales hasta que decidas subirlos." : "Sesión iniciada y sincronizada.");
       refreshCloudUI();
+      if(localCloudUploadPending) showLocalUploadBanner();
     }else if(currentAuthTab==='signup'){
       if(!pass || pass.length < 6) return setAuthMessage("Contraseña mínima: 6 caracteres.", true);
       if(pass !== pass2) return setAuthMessage("La confirmación no coincide.", true);
@@ -5341,9 +6186,10 @@ async function authPrimaryAction(){
       // Si email confirmations están activos, session puede ser null
       if(data.session){
         sbSession = data.session; sbUser = data.user;
-        setAuthMessage("Cuenta creada e iniciada. Sincronizando...");
+        setAuthMessage("Cuenta creada e iniciada. Revisando sincronización...");
         await smartInitialSync();
-        setAuthMessage("Cuenta creada y sincronizada.");
+        setAuthMessage(localCloudUploadPending ? "Cuenta creada. Tus cambios quedaron locales hasta que decidas subirlos." : "Cuenta creada y sincronizada.");
+        if(localCloudUploadPending) showLocalUploadBanner();
       }else{
         setAuthMessage("Cuenta creada. Revisa tu correo para confirmar e inicia sesión.", false);
       }
@@ -5391,48 +6237,153 @@ async function pullFromCloud(){
 async function pushToCloud(){
   if(!isCloudEnabled()) throw new Error("No hay sesión en la nube.");
   markLocalUpdated();
+  const nowISO = new Date().toISOString();
   const payload = {
     user_id: sbUser.id,
     data: db,
-    updated_at: new Date().toISOString()
+    updated_at: nowISO
   };
   const {error} = await sb
     .from('shifter_state')
     .upsert(payload, { onConflict: 'user_id' });
   if(error) throw error;
+  // Registrar el timestamp subido para evitar re-preguntar al próximo arranque
+  db._meta = db._meta || {};
+  db._meta.lastSyncedCloudTS = nowISO;
+  _origSaveDB();
+}
+
+// Merge inteligente: cloud gana en mes actual y futuro, local conserva meses pasados
+function mergeSmartPull(cloudDb, localDb){
+  try{
+    const now = new Date();
+    const curY = now.getFullYear();
+    const curM = now.getMonth() + 1;
+
+    function isPastMonth(dk){
+      const p = dk.split('-');
+      if(p.length < 2) return false;
+      const y = parseInt(p[0], 10), m = parseInt(p[1], 10);
+      return y < curY || (y === curY && m < curM);
+    }
+
+    const merged = JSON.parse(JSON.stringify(cloudDb || localDb));
+    if(!merged.users) merged.users = {};
+
+    // Para cada usuario local, conservar datos de meses pasados
+    if(localDb && localDb.users){
+      Object.keys(localDb.users).forEach(uk => {
+        const lu = localDb.users[uk];
+        if(!lu || !lu.data) return;
+        if(!merged.users[uk]) return; // usuario no existe en nube, no tocamos
+        if(!merged.users[uk].data) merged.users[uk].data = {};
+        Object.keys(lu.data).forEach(dk => {
+          if(isPastMonth(dk)){
+            // Conservar dato local para meses pasados
+            merged.users[uk].data[dk] = lu.data[dk];
+          }
+        });
+      });
+    }
+    return merged;
+  }catch(e){
+    console.error('mergeSmartPull error:', e);
+    return cloudDb || localDb;
+  }
 }
 
 async function smartInitialSync(){
   if(!isCloudEnabled()) return;
+  if(smartSyncPromise) return smartSyncPromise;
 
-  // Asegurar meta local
-  db._meta = db._meta || {};
-  const localTS = db._meta.updated_at ? Date.parse(db._meta.updated_at) : 0;
+  smartSyncPromise = (async () => {
+    db._meta = db._meta || {};
+    const localTS = db._meta.updated_at ? Date.parse(db._meta.updated_at) : 0;
+    // lastSyncedCloudTS: timestamp de la versión de la nube con la que sincronizamos por última vez
+    const lastSyncedCloudTS = db._meta.lastSyncedCloudTS ? Date.parse(db._meta.lastSyncedCloudTS) : null;
+    const localDbSnapshot = JSON.parse(JSON.stringify(db));
 
-  const row = await pullFromCloud();
-  if(!row){
-    // primer push
-    await pushToCloud();
-    return;
-  }
-
-  const cloudTS = row.updated_at ? Date.parse(row.updated_at) : 0;
-
-  if(cloudTS > localTS){
-    // nube más reciente: reemplazar local
-    db = row.data || db;
-    // mantener compatibilidad: asegurar estructura mínima
     try{
-      // Re-guardar y re-render
-      saveDB(); // también marca meta
-      safeInitAfterCloudReplace();
-    }catch(e){ console.error(e); }
-  }else if(localTS > cloudTS){
-    // local más reciente: subir
-    await pushToCloud();
-  }else{
-    // iguales: nada
-  }
+      const row = await pullFromCloud();
+      if(!row){
+        // No hay datos en la nube: subir local y registrar timestamp
+        await pushToCloud();
+        remoteConflictPending = false;
+        lastRemotePayload = null;
+        cloudInitReady = true;
+        lastSyncTime = new Date();
+        updateSyncStatusUI();
+        subscribeRealtime();
+        return;
+      }
+
+      const cloudTS = row.updated_at ? Date.parse(row.updated_at) : 0;
+      const localHasData = hasMeaningfulLocalData(localDbSnapshot);
+
+      // Detectar si hubo cambios reales desde la última sincronización exitosa
+      const cloudChangedSinceLastSync = lastSyncedCloudTS === null
+        ? (cloudTS > 0)
+        : (cloudTS > lastSyncedCloudTS);
+      const localChangedSinceLastSync = lastSyncedCloudTS === null
+        ? localHasData
+        : (localTS > lastSyncedCloudTS);
+
+      if(!cloudChangedSinceLastSync && !localChangedSinceLastSync){
+        // Nada cambió desde la última sincronización: continuar sin preguntar
+        cloudInitReady = true;
+        lastSyncTime = new Date();
+        updateSyncStatusUI();
+        subscribeRealtime();
+        return;
+      }
+
+      if(cloudChangedSinceLastSync && !localChangedSinceLastSync){
+        // Solo la nube tiene cambios nuevos: aplicar automáticamente sin preguntar
+        applyCloudDb(row.data);
+        db._meta.lastSyncedCloudTS = row.updated_at;
+        _origSaveDB();
+      } else if(!cloudChangedSinceLastSync && localChangedSinceLastSync){
+        // Solo el local tiene cambios: marcar como pendiente de subir
+        localCloudUploadPending = true;
+      } else {
+        // Ambos tienen cambios (conflicto real): preguntar al usuario
+        if(localHasData){
+          const choice = await openSyncDecisionModal();
+          if(choice === 'merge'){
+            const mergedDb = mergeSmartPull(row.data, localDbSnapshot);
+            applyCloudDb(mergedDb);
+            db._meta.lastSyncedCloudTS = row.updated_at;
+            _origSaveDB();
+          }else if(choice === 'cloud'){
+            applyCloudDb(row.data);
+            db._meta.lastSyncedCloudTS = row.updated_at;
+            _origSaveDB();
+          }else if(choice === 'keep-local'){
+            localCloudUploadPending = true;
+          }
+        }else{
+          applyCloudDb(row.data);
+          db._meta.lastSyncedCloudTS = row.updated_at;
+          _origSaveDB();
+        }
+      }
+
+      remoteConflictPending = false;
+      lastRemotePayload = null;
+      lastSyncTime = new Date();
+      cloudInitReady = true;
+      updateSyncStatusUI();
+      subscribeRealtime();
+    }catch(e){
+      console.error('smartInitialSync error:', e);
+      cloudInitReady = true; // permitir operación normal aunque falle sync
+      updateSyncStatusUI();
+    }finally{
+      smartSyncPromise = null;
+    }
+  })();
+
+  return smartSyncPromise;
 }
 
 function safeInitAfterCloudReplace(){
@@ -5454,15 +6405,15 @@ function safeInitAfterCloudReplace(){
 
 function scheduleCloudPush(){
   if(!isCloudEnabled()) return;
-  if(cloudDebounceTimer) clearTimeout(cloudDebounceTimer);
-  cloudDebounceTimer = setTimeout(async ()=>{
-    try{
-      await pushToCloud();
-      // opcional: feedback silencioso
-    }catch(e){
-      console.warn("Cloud push failed:", e);
-    }
-  }, 1500);
+  if(!cloudInitReady) return;
+  if(remoteConflictPending){
+    updateSyncStatusUI('pending-remote');
+    showCloudUpdateBanner();
+    return;
+  }
+  localCloudUploadPending = true;
+  updateSyncStatusUI('pending-local');
+  showLocalUploadBanner();
 }
 
 async function manualSyncNow(){
@@ -5470,9 +6421,20 @@ async function manualSyncNow(){
     openAuthModal();
     return;
   }
+  if(remoteConflictPending){
+    showCloudUpdateBanner();
+    if(typeof toast === 'function') toast('Hay cambios pendientes de otro dispositivo. Decide primero qué hacer.');
+    return;
+  }
+  if(localCloudUploadPending){
+    showLocalUploadBanner();
+    if(typeof toast === 'function') toast('Tienes cambios locales pendientes de decidir.');
+    return;
+  }
   try{
     await smartInitialSync();
-    alert("Sincronización completada.");
+    updateSyncStatusUI();
+    alert("Revisión de sincronización completada.");
   }catch(e){
     alert("Error sincronizando: " + (e.message||e));
   }
@@ -5484,9 +6446,7 @@ async function pullFromCloudUI(){
     const row = await pullFromCloud();
     if(!row){ return alert("No hay datos en la nube aún."); }
     if(!confirm("Esto reemplazará tus datos locales por los de la nube. ¿Continuar?")) return;
-    db = row.data || db;
-    saveDB();
-    safeInitAfterCloudReplace();
+    applyCloudDb(row.data || db);
     alert("Datos de la nube aplicados.");
   }catch(e){
     alert("Error: " + (e.message||e));
@@ -5497,6 +6457,10 @@ async function pushToCloudUI(){
   if(!isCloudEnabled()) return openAuthModal();
   try{
     await pushToCloud();
+    localCloudUploadPending = false;
+    dismissLocalUploadBanner();
+    lastSyncTime = new Date();
+    updateSyncStatusUI('synced');
     alert("Datos enviados a la nube.");
   }catch(e){
     alert("Error: " + (e.message||e));
@@ -5506,15 +6470,272 @@ async function pushToCloudUI(){
 // Hook: extender saveDB para también programar push a nube (si hay sesión)
 const _origSaveDB = saveDB;
 saveDB = function(){
-  try{ markLocalUpdated(); }catch(e){}
+  if(cloudInitReady){ // solo marcar tiempo y empujar tras init
+    try{ markLocalUpdated(); }catch(e){}
+  }
   _origSaveDB();
   scheduleCloudPush();
 };
+
+function updateSyncStatusUI(state){
+  // state: 'offline' | 'pending' | 'synced' | 'error' | 'pending-remote' | 'pending-local'
+  const dot = document.getElementById('syncDot');
+  const statusBar = document.getElementById('syncStatusBar');
+  const statusMetaRow = document.getElementById('statusMetaRow');
+  const drawerLine = document.getElementById('drawerSyncLine');
+
+  const isLogged = !!sbUser;
+  const ts = lastSyncTime ? lastSyncTime.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'}) : null;
+  const isRemotePending = remoteConflictPending || state === 'pending-remote';
+
+  if(dot){
+    dot.className = 'sync-dot block ' + (
+      !isLogged ? 'offline' :
+      (state === 'pending' || isRemotePending) ? 'pending' :
+      state === 'error'   ? 'error' :
+      'synced'
+    );
+    dot.title = !isLogged ? 'Sin sesión — toca para iniciar' :
+                isRemotePending ? 'Hay cambios pendientes de otro dispositivo' :
+                state === 'pending' ? 'Guardando en la nube...' :
+                state === 'pending-local' ? 'Cambios locales pendientes de subir' :
+                state === 'error'   ? 'Error de sincronización' :
+                ts ? `Sincronizado ${ts}` : 'Sincronizado';
+  }
+
+  if(statusBar && statusMetaRow){
+    if(isLogged){
+      statusBar.textContent = isRemotePending ? 'Cambios pendientes de otro dispositivo' :
+                              state === 'pending-local' ? 'Cambios locales solo en este dispositivo' :
+                              state === 'pending' ? 'Guardando...' :
+                              state === 'error'   ? 'Error al sincronizar' :
+                              ts ? `Sincronizado a las ${ts}` : 'Sincronizado';
+      statusMetaRow.classList.remove('hidden');
+    } else {
+      statusMetaRow.classList.add('hidden');
+    }
+  }
+
+  if(drawerLine){
+    drawerLine.textContent = !isLogged ? 'Sin sesión de nube — inicia sesión' :
+                             isRemotePending ? 'Hay cambios pendientes de otro dispositivo' :
+                             localCloudUploadPending ? 'Tienes cambios locales pendientes de decidir' :
+                             ts ? `Nube activa · ${ts}` : 'Nube activa';
+  }
+
+  const el = document.getElementById('cloudStatus');
+  if(el) el.textContent = isLogged ? `Nube: ✓ ${ts||''}` : 'Nube: OFF';
+
+  const authDeviceInfo = document.getElementById('authDeviceInfo');
+  if(authDeviceInfo){
+    authDeviceInfo.classList.toggle('hidden', !isRemotePending);
+  }
+}
+
+function subscribeRealtime(){
+  if(!sb || !sbUser) return;
+  if(realtimeChannel) return; // ya suscrito
+  try{
+    realtimeChannel = sb.channel('shifter_changes_' + sbUser.id)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'shifter_state',
+        filter: `user_id=eq.${sbUser.id}`
+      }, (payload) => {
+        const row = payload?.new || {};
+        const remoteData = row?.data || {};
+        const remoteDevice = remoteData?._meta?.device_id;
+        const myDevice = getDeviceId();
+        if(remoteDevice && remoteDevice !== myDevice){
+          remoteConflictPending = true;
+          lastRemotePayload = row;
+          showCloudUpdateBanner();
+          updateSyncStatusUI('pending-remote');
+        }
+      })
+      .subscribe();
+  }catch(e){ console.warn('Realtime subscribe error:', e); }
+}
+
+function showCloudUpdateBanner(){
+  let banner = document.getElementById('cloudUpdateBanner');
+  if(!banner){
+    banner = document.createElement('div');
+    banner.id = 'cloudUpdateBanner';
+    banner.style.cssText = 'position:fixed;top:78px;left:50%;transform:translateX(-50%);z-index:9999;background:#0f172a;color:#fff;padding:14px 16px;border-radius:18px;font-size:12px;font-weight:900;display:flex;gap:14px;align-items:center;max-width:min(94vw,620px);width:calc(100vw - 24px);';
+    banner.innerHTML = `
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:900;margin-bottom:4px;line-height:1.2;">Cambios detectados en otro dispositivo</div>
+        <div style="font-size:11px;opacity:0.88;font-weight:700;line-height:1.35;">Hay una versión más reciente en la nube. El sistema no reemplazará tus datos por sí solo. Decide si deseas actualizar o ignorar por ahora.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0;align-self:stretch;">
+        <button onclick="pullLatestAndDismissBanner()" style="background:#22c55e;border:none;color:#fff;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;font-size:11px;white-space:nowrap;">✓ Actualizar</button>
+        <button onclick="dismissCloudBanner()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);color:#fff;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;font-size:11px;white-space:nowrap;">✕ Ignorar</button>
+      </div>`;
+    document.body.appendChild(banner);
+  }
+  banner.style.display = 'flex';
+}
+
+function dismissCloudBanner(){
+  const b = document.getElementById('cloudUpdateBanner');
+  if(b) b.style.display = 'none';
+}
+
+async function pullLatestAndDismissBanner(){
+  dismissCloudBanner();
+  try{
+    const row = await pullFromCloud();
+    if(!row) return;
+    const localDbSnapshot = JSON.parse(JSON.stringify(db));
+    const mergedDb = mergeSmartPull(row.data, localDbSnapshot);
+    applyCloudDb(mergedDb);
+    toast && toast('Datos actualizados desde la nube');
+  }catch(e){
+    console.warn('pullLatest error:', e);
+  }
+}
+
+function showLocalUploadBanner(){
+  let banner = document.getElementById('cloudLocalBanner');
+  if(!banner){
+    banner = document.createElement('div');
+    banner.id = 'cloudLocalBanner';
+    banner.style.cssText = 'position:fixed;bottom:82px;left:50%;transform:translateX(-50%);z-index:9998;background:#0f172a;color:#fff;padding:14px 16px;border-radius:18px;font-size:12px;font-weight:900;display:flex;gap:14px;align-items:center;max-width:min(94vw,620px);width:calc(100vw - 24px);box-shadow:0 8px 32px rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.12);';
+    banner.innerHTML = `
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:900;margin-bottom:4px;line-height:1.2;">Cambios locales sin subir</div>
+        <div style="font-size:11px;opacity:0.88;font-weight:700;line-height:1.35;">Detecté cambios en este dispositivo. Decide si deseas enviarlos a la nube o conservarlos solo de forma local.</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-shrink:0;align-self:stretch;">
+        <button onclick="confirmUploadLocalChanges()" style="background:#22c55e;border:none;color:#fff;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;font-size:11px;white-space:nowrap;">☁️ Subir</button>
+        <button onclick="keepChangesLocalOnly()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);color:#fff;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;font-size:11px;white-space:nowrap;">💾 Local</button>
+      </div>`;
+    document.body.appendChild(banner);
+  }
+  banner.style.display = localCloudUploadPending ? 'flex' : 'none';
+}
+
+function dismissLocalUploadBanner(){
+  const b = document.getElementById('cloudLocalBanner');
+  if(b) b.style.display = 'none';
+}
+
+async function confirmUploadLocalChanges(){
+  dismissLocalUploadBanner();
+  if(remoteConflictPending){
+    showCloudUpdateBanner();
+    return;
+  }
+  try{
+    updateSyncStatusUI('pending');
+    await pushToCloud();
+    localCloudUploadPending = false;
+    lastSyncTime = new Date();
+    updateSyncStatusUI('synced');
+    if(typeof toast === 'function') toast('Cambios enviados a la nube');
+  }catch(e){
+    console.warn('confirmUploadLocalChanges error:', e);
+    updateSyncStatusUI('error');
+  }
+}
+
+function keepChangesLocalOnly(){
+  localCloudUploadPending = false;
+  dismissLocalUploadBanner();
+  updateSyncStatusUI();
+  if(typeof toast === 'function') toast('Cambios conservados solo en este dispositivo');
+}
 
 // Iniciar supabase al cargar
 window.addEventListener('load', () => {
   initSupabase();
 });
+
+// =========================================================
+// PWA: icono y manifest generados en canvas
+// =========================================================
+(function(){
+  try{
+    // Generar icono 192x192 en canvas
+    const sz = 192;
+    const c = document.createElement('canvas');
+    c.width = sz; c.height = sz;
+    const ctx = c.getContext('2d');
+    // Fondo degradado
+    const g = ctx.createLinearGradient(0, 0, sz, sz);
+    g.addColorStop(0, '#1e40af');
+    g.addColorStop(1, '#0f172a');
+    ctx.fillStyle = g;
+    // Rectángulo redondeado
+    const r = 38;
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.lineTo(sz-r, 0);
+    ctx.quadraticCurveTo(sz, 0, sz, r);
+    ctx.lineTo(sz, sz-r);
+    ctx.quadraticCurveTo(sz, sz, sz-r, sz);
+    ctx.lineTo(r, sz);
+    ctx.quadraticCurveTo(0, sz, 0, sz-r);
+    ctx.lineTo(0, r);
+    ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.closePath();
+    ctx.fill();
+    // Grid del calendario (3x4 celdas blancas)
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    const margin = 28, cols = 3, rows = 4, gap = 8;
+    const cellW = (sz - margin*2 - gap*(cols-1)) / cols;
+    const cellH = (sz - margin*2 - 18 - gap*(rows-1)) / rows;
+    // Cabecera del calendario
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.beginPath();
+    const hh = 20;
+    ctx.roundRect ? ctx.roundRect(margin, margin, sz-margin*2, hh, 5) : ctx.rect(margin, margin, sz-margin*2, hh);
+    ctx.fill();
+    // Celdas
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    for(let rr=0; rr<rows; rr++){
+      for(let cc=0; cc<cols; cc++){
+        const x = margin + cc*(cellW+gap);
+        const y = margin + hh + 8 + rr*(cellH+gap);
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(x, y, cellW, cellH, 4) : ctx.rect(x, y, cellW, cellH);
+        ctx.fill();
+      }
+    }
+    // "S" central
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 68px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('S', sz/2 + 2, sz/2 + 6);
+
+    const iconDataUrl = c.toDataURL('image/png');
+
+    // Asignar apple-touch-icon
+    const link = document.getElementById('appTouchIcon');
+    if(link) link.href = iconDataUrl;
+
+    // Manifest inline
+    const manifest = {
+      name: 'Shifter Pro',
+      short_name: 'Shifter',
+      start_url: './',
+      display: 'standalone',
+      background_color: '#0f172a',
+      theme_color: '#1e293b',
+      icons: [
+        { src: iconDataUrl, sizes: '192x192', type: 'image/png' },
+        { src: iconDataUrl, sizes: '512x512', type: 'image/png' }
+      ]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+    const manifestUrl = URL.createObjectURL(manifestBlob);
+    const mlink = document.getElementById('pwaManifest');
+    if(mlink) mlink.href = manifestUrl;
+  }catch(e){ console.warn('PWA icon error:', e); }
+})();
 </script>
 
 
@@ -5530,7 +6751,64 @@ window.addEventListener('load', () => {
   </div>
 </div>
 
+<!-- Modal decisión de sincronización inicial -->
+<div id="syncDecisionModal" class="modal">
+  <div class="bg-white w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl border border-gray-100 mx-2">
+    <div class="bg-[#1e3a5f] text-white text-center py-4 px-5 font-black text-sm uppercase tracking-widest">
+      Protección entre dispositivos
+    </div>
+    <div class="p-5 md:p-6 space-y-4">
+      <div>
+        <div class="text-[15px] font-black text-gray-900 mb-2">La nube tiene cambios más recientes y este dispositivo también ya tiene información.</div>
+        <div class="text-[12px] font-bold text-gray-600 leading-relaxed">Elige cómo deseas continuar. El sistema no reemplazará tus datos automáticamente sin que tú lo decidas.</div>
+      </div>
+
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-[11px] font-bold text-amber-900">
+        Recomendado: <span class="font-black">Fusionar</span>, para conservar tus meses anteriores y combinar el estado más reciente de la nube.
+      </div>
+
+      <div class="space-y-2.5">
+        <button type="button" onclick="resolveSyncDecision('merge')" class="w-full rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-left">
+          <div class="font-black text-[12px] text-blue-900">🔀 Fusionar</div>
+          <div class="text-[11px] font-bold text-blue-800 mt-1">Combina la nube respetando tus meses anteriores.</div>
+        </button>
+
+        <button type="button" onclick="resolveSyncDecision('cloud')" class="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-left">
+          <div class="font-black text-[12px] text-gray-900">☁️ Usar nube</div>
+          <div class="text-[11px] font-bold text-gray-600 mt-1">Reemplaza todo con lo que ya está guardado en la nube.</div>
+        </button>
+
+        <button type="button" onclick="resolveSyncDecision('keep-local')" class="w-full rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-left">
+          <div class="font-black text-[12px] text-emerald-900">💾 Conservar mis datos</div>
+          <div class="text-[11px] font-bold text-emerald-800 mt-1">Mantiene lo local y lo sube a la nube.</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Auth (Supabase) -->
+
+<div id="cloudUploadDecisionModal" class="modal">
+  <div class="bg-white rounded-[28px] w-full max-w-md overflow-hidden shadow-2xl">
+    <div class="bg-slate-900 text-white px-5 py-4">
+      <div class="text-[13px] font-black uppercase tracking-[0.2em]">Cambios locales</div>
+      <div class="mt-1 text-lg font-black leading-tight">¿Qué deseas hacer con los cambios de este dispositivo?</div>
+      <div class="mt-2 text-[12px] text-white/80 font-semibold leading-relaxed">No se subirán automáticamente. Puedes enviarlos a la nube o mantenerlos solo en este dispositivo.</div>
+    </div>
+    <div class="p-5 space-y-3 bg-gray-50">
+      <button type="button" onclick="resolveLocalUploadDecision('upload')" class="w-full p-4 rounded-2xl border border-emerald-200 bg-emerald-50 text-left hover:bg-emerald-100 transition-colors">
+        <div class="font-black text-[12px] text-emerald-900">☁️ Subir a la nube</div>
+        <div class="text-[11px] text-emerald-700 font-semibold mt-1">Envía esta versión y úsala también en los demás dispositivos.</div>
+      </button>
+      <button type="button" onclick="resolveLocalUploadDecision('local')" class="w-full p-4 rounded-2xl border border-slate-200 bg-white text-left hover:bg-slate-50 transition-colors">
+        <div class="font-black text-[12px] text-slate-900">💾 Dejar solo local</div>
+        <div class="text-[11px] text-slate-600 font-semibold mt-1">Conserva los cambios en este dispositivo sin subirlos todavía.</div>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="authModal" class="modal">
   <div class="bg-white w-full max-w-md rounded-3xl md:rounded-[40px] overflow-hidden shadow-2xl border border-gray-100 mx-2">
     <div class="bg-gradient-to-r from-indigo-600 to-sky-600 text-white text-center py-4 font-black text-sm uppercase tracking-widest relative">
@@ -5563,7 +6841,17 @@ window.addEventListener('load', () => {
         </div>
 
         <div class="bg-blue-50 border border-blue-100 rounded-2xl p-3 text-[10px] font-bold text-blue-900">
-          La nube guarda y sincroniza toda tu información: perfiles, turnos, categorías, asuetos, fotos y notas.
+          La nube sincroniza toda tu información entre dispositivos. Si existe un conflicto, siempre se te preguntará antes de reemplazar datos.
+        </div>
+
+        <div id="authDeviceInfo" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-3 text-[10px] font-bold text-amber-900">
+          <div class="flex items-start gap-2">
+            <span class="text-lg">⚠️</span>
+            <div>
+              <div class="font-black mb-1">Sesión activa en otro dispositivo</div>
+              <div>Hay cambios pendientes de otro dispositivo. Decide si deseas actualizar esta pantalla o conservar tus datos antes de volver a sincronizar.</div>
+            </div>
+          </div>
         </div>
 
         <div class="flex flex-col gap-2">
