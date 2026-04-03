@@ -878,8 +878,11 @@
     #calendar {
       flex: 1 1 auto;
       min-height: 0;
+      height: var(--calendar-grid-height, auto);
+      max-height: var(--calendar-grid-height, none);
       align-content: stretch;
       grid-auto-rows: var(--calendar-row-height, 1fr);
+      overflow: hidden;
     }
     .day-cell {
       min-height: var(--calendar-row-height, 1fr) !important;
@@ -2855,12 +2858,12 @@ function fitCalendarToViewport(){
   const weekHeaderH = weekHeader.getBoundingClientRect().height || 0;
   const bottomTabsH = bottomTabs.getBoundingClientRect().height || 0;
 
-  const available = Math.floor(viewportH - viewTop - weekHeaderH - bottomTabsH - 8);
+  const available = Math.floor(viewportH - viewTop - weekHeaderH - bottomTabsH - 12);
   if (available <= 0) return;
 
   const rowGap = 1;
   const totalGaps = Math.max(0, rows - 1) * rowGap;
-  const rowHeight = Math.max(68, Math.floor((available - totalGaps) / rows));
+  const rowHeight = Math.max(54, Math.floor((available - totalGaps) / rows));
   const gridHeight = rows * rowHeight + totalGaps;
 
   document.documentElement.style.setProperty('--calendar-row-height', rowHeight + 'px');
@@ -7869,9 +7872,8 @@ window.addEventListener('load', () => {
   </div>
 </div>
 
-</body>
-</html>
 
+<script>
 (function(){
   const profilesModal = document.getElementById('profilesModal');
   if(profilesModal){
@@ -7880,3 +7882,7 @@ window.addEventListener('load', () => {
     }, { passive: true });
   }
 })();
+</script>
+
+</body>
+</html>
