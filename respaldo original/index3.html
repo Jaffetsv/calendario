@@ -302,15 +302,6 @@
       display: flex;
     }
 
-    .modal-scroll-shell {
-      width: 100%;
-      max-height: calc(100vh - 24px);
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-    }
-
     /* ===== TOAST ===== */
     #toastContainer {
       position: fixed;
@@ -801,7 +792,6 @@
       cursor: pointer;
       font: inherit;
       font-weight: 900;
-      line-height: 1.05;
     }
     .month-picker-trigger:focus-visible {
       outline: 2px solid rgba(255,255,255,0.45);
@@ -809,31 +799,26 @@
       border-radius: 10px;
     }
     #currentYearLabel {
-      font-size: 24px;
-      line-height: 1.05;
-      font-weight: 900;
-      color: #ffffff;
-      letter-spacing: 0.01em;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .month-year-row {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-width: 0;
-      flex-wrap: nowrap;
-      line-height: 1.05;
-    }
-    .month-year-sep {
-      font-size: 20px;
+      font-size: 13px;
       line-height: 1;
       font-weight: 800;
-      color: rgba(255,255,255,0.78);
+      color: rgba(255,255,255,0.68);
+      letter-spacing: 0.04em;
+    }
+    .month-year-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      flex-wrap: nowrap;
+    }
+    .month-year-sep {
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 900;
+      color: #ffffff;
       flex-shrink: 0;
-      transform: translateY(-1px);
     }
     .month-today-btn {
       border: none;
@@ -941,11 +926,11 @@
     <div class="flex flex-1 min-w-0 flex-col items-center justify-center text-center">
       <div class="month-year-row">
         <button type="button" id="monthTriggerBtn" class="month-picker-trigger truncate" onclick="openMonthPicker()" aria-label="Seleccionar mes">
-          <span id="currentMonthLabel" class="truncate" style="color:#ffffff;font-weight:900;font-size:24px;line-height:1.05;display:inline-flex;align-items:center;">Marzo</span>
+          <span id="currentMonthLabel" class="truncate" style="color:#ffffff;font-weight:900;font-size:24px;line-height:1;display:inline-block;">Marzo</span>
         </button>
         <span class="month-year-sep" aria-hidden="true">/</span>
         <button type="button" id="yearTriggerBtn" class="month-picker-trigger" onclick="openYearPicker()" aria-label="Seleccionar año">
-          <span id="currentYearLabel" style="color:#ffffff;font-weight:900;font-size:24px;line-height:1.05;display:inline-flex;align-items:center;">2026</span>
+          <span id="currentYearLabel" style="color:#ffffff;font-weight:900;font-size:24px;line-height:1;display:inline-block;">2026</span>
         </button>
       </div>
       <div class="mt-1 flex items-center justify-center">
@@ -1662,52 +1647,49 @@
 </div>
 
 <!-- Modal Profiles - CORREGIDO: Nombres visibles en selects -->
-<div id="profilesModal" class="modal" style="padding:12px;align-items:flex-start;justify-content:center;">
-  <div class="modal-scroll-shell">
-    <div class="bg-white w-full max-w-3xl rounded-3xl md:rounded-[40px] p-4 md:p-6 lg:p-8 shadow-2xl mx-auto my-3 md:my-6 max-h-[calc(100vh-24px)] overflow-y-auto overscroll-contain" style="-webkit-overflow-scrolling:touch;touch-action:pan-y;position:relative;">
-      <button onclick="closeProfilesModal()" aria-label="Cerrar" class="absolute top-3 right-3 md:top-4 md:right-4 w-11 h-11 rounded-2xl bg-gray-100 hover:bg-gray-200 border border-gray-200 flex items-center justify-center text-gray-700 text-2xl leading-none font-black">✕</button>
-      <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3 pr-12">
-        <div>
-          <h3 class="font-black uppercase text-base md:text-lg">👤 Gestión de Perfiles</h3>
-          <p class="text-[11px] text-gray-500 font-bold">Crear, editar, asignar localidad o eliminar perfiles.</p>
-        </div>
-        <div class="flex gap-2 flex-wrap">
-          <button onclick="detectDuplicateProfiles()" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black uppercase whitespace-nowrap">🔍 Detectar duplicados</button>
-          <button onclick="deleteAllProfilesExceptAdmin()" class="px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-[10px] font-black uppercase whitespace-nowrap">🧹 Eliminar todos (dejar ADMIN)</button>
-          <button onclick="closeProfilesModal()" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-[10px] font-black uppercase whitespace-nowrap">Cerrar</button>
-        </div>
+<div id="profilesModal" class="modal" style="overflow-y:auto;">
+  <div class="bg-white w-full max-w-3xl rounded-3xl md:rounded-[40px] p-4 md:p-6 lg:p-8 shadow-2xl mx-2 my-auto">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3">
+      <div>
+        <h3 class="font-black uppercase text-base md:text-lg">👤 Gestión de Perfiles</h3>
+        <p class="text-[11px] text-gray-500 font-bold">Crear, editar, asignar localidad o eliminar perfiles.</p>
       </div>
+      <div class="flex gap-2 flex-wrap">
+        <button onclick="detectDuplicateProfiles()" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black uppercase whitespace-nowrap">🔍 Detectar duplicados</button>
+        <button onclick="deleteAllProfilesExceptAdmin()" class="px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-[10px] font-black uppercase whitespace-nowrap">🧹 Eliminar todos (dejar ADMIN)</button>
+        <button onclick="closeProfilesModal()" class="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-[10px] font-black uppercase whitespace-nowrap">Cerrar</button>
+      </div>
+    </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-3xl p-4">
-          <h4 class="text-[12px] font-black text-gray-700 uppercase mb-3">➕ Crear perfil</h4>
-          <div class="space-y-3">
-            <input id="createName" type="text" placeholder="Nombre completo" class="w-full bg-white border-blue-200 focus:border-blue-400 text-gray-900">
-            <input id="createPin" type="password" placeholder="PIN (4 dígitos)" maxlength="4" class="w-full bg-white border-blue-200 focus:border-blue-400 text-gray-900">
-            <div>
-              <label class="text-[11px] font-bold text-gray-600 block mb-2">Localidad</label>
-              <select id="createLoc" class="w-full bg-white border-blue-200 focus:border-blue-400 text-gray-900"></select>
-            </div>
-            <button onclick="createProfile()" class="w-full p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black uppercase text-[11px]">
-              Crear
-            </button>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-3xl p-4">
+        <h4 class="text-[12px] font-black text-gray-700 uppercase mb-3">➕ Crear perfil</h4>
+        <div class="space-y-3">
+          <input id="createName" type="text" placeholder="Nombre completo" class="w-full bg-white border-blue-200 focus:border-blue-400 text-gray-900">
+          <input id="createPin" type="password" placeholder="PIN (4 dígitos)" maxlength="4" class="w-full bg-white border-blue-200 focus:border-blue-400 text-gray-900">
+          <div>
+            <label class="text-[11px] font-bold text-gray-600 block mb-2">Localidad</label>
+            <select id="createLoc" class="w-full bg-white border-blue-200 focus:border-blue-400 text-gray-900"></select>
           </div>
-        </div>
-
-        <div class="bg-white border border-gray-200 rounded-3xl p-4">
-          <div class="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
-            <h4 class="text-[12px] font-black text-gray-700 uppercase">Perfiles existentes</h4>
-            <button onclick="renderProfilesList()" class="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-[10px] font-black uppercase whitespace-nowrap">Actualizar</button>
-          </div>
-          <div id="profilesList" class="max-h-[300px] md:max-h-[360px] overflow-y-auto overscroll-contain space-y-2" style="-webkit-overflow-scrolling:touch;touch-action:pan-y;"></div>
+          <button onclick="createProfile()" class="w-full p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black uppercase text-[11px]">
+            Crear
+          </button>
         </div>
       </div>
 
-      <!-- Sección de duplicados -->
-      <div id="duplicateProfilesSection" class="hidden mt-4 bg-amber-50 border border-amber-200 rounded-3xl p-4">
-        <h4 class="text-[12px] font-black text-amber-800 uppercase mb-3">⚠️ Perfiles Duplicados Detectados</h4>
-        <div id="duplicateProfilesList" class="space-y-3"></div>
+      <div class="bg-white border border-gray-200 rounded-3xl p-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
+          <h4 class="text-[12px] font-black text-gray-700 uppercase">Perfiles existentes</h4>
+          <button onclick="renderProfilesList()" class="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-[10px] font-black uppercase whitespace-nowrap">Actualizar</button>
+        </div>
+        <div id="profilesList" class="max-h-[300px] md:max-h-[360px] overflow-y-auto space-y-2"></div>
       </div>
+    </div>
+
+    <!-- Sección de duplicados -->
+    <div id="duplicateProfilesSection" class="hidden mt-4 bg-amber-50 border border-amber-200 rounded-3xl p-4">
+      <h4 class="text-[12px] font-black text-amber-800 uppercase mb-3">⚠️ Perfiles Duplicados Detectados</h4>
+      <div id="duplicateProfilesList" class="space-y-3"></div>
     </div>
   </div>
 </div>
@@ -4684,19 +4666,12 @@ function openProfilesModal(){
   renderProfilesList();
   
   const modal = document.getElementById('profilesModal');
-  if (modal) {
-    modal.classList.add('active');
-    document.body.dataset.prevOverflow = document.body.style.overflow || '';
-    document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
-  }
+  if (modal) modal.classList.add('active');
 }
 
 function closeProfilesModal(){
   const modal = document.getElementById('profilesModal');
   if (modal) modal.classList.remove('active');
-  document.body.style.overflow = document.body.dataset.prevOverflow || '';
-  document.body.style.touchAction = '';
 }
 
 function createProfile(){
@@ -7871,12 +7846,3 @@ window.addEventListener('load', () => {
 
 </body>
 </html>
-
-(function(){
-  const profilesModal = document.getElementById('profilesModal');
-  if(profilesModal){
-    profilesModal.addEventListener('click', (e)=>{
-      if(e.target === profilesModal || e.target.classList?.contains('modal-scroll-shell')) closeProfilesModal();
-    }, { passive: true });
-  }
-})();
