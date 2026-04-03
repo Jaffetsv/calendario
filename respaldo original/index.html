@@ -17,29 +17,28 @@
     // Fallback si tailwind no carga
     if (typeof tailwind === 'undefined') {
       console.log('Tailwind CDN no cargó, usando estilos inline');
-      document.write(`
-        <style>
-          body { font-family: system-ui, -apple-system, sans-serif; }
-          .hidden { display: none !important; }
-          .grid { display: grid; }
-          .flex { display: flex; }
-          .block { display: block !important; }
-          /* === UX: evitar selección/callout al mantener presionado (iOS/Android/PC) === */
-          .day-cell, .day-cell *{
-            -webkit-user-select:none;
-            user-select:none;
-            -webkit-touch-callout:none;
-          }
-          .day-cell{ touch-action: manipulation; }
-        </style>
-      `);
+      document.write('<style>' + 
+        'body { font-family: system-ui, -apple-system, sans-serif; }' +
+        '.hidden { display: none !important; }' +
+        '.grid { display: grid; }' +
+        '.flex { display: flex; }' +
+        '.block { display: block !important; }' +
+        '
+    /* === UX: evitar selección/callout al mantener presionado (iOS/Android/PC) === */
+    .day-cell, .day-cell *{
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-touch-callout:none;
+    }
+    .day-cell{ touch-action: manipulation; }
+
+</style>');
     }
   </script>
   
   <!-- Scripts con atributos async/defer -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" async></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <style>
@@ -126,7 +125,6 @@
     /* Colores de turnos - Nombres en español */
     .bg-Mañana { background: #ffff00 !important; }
     .bg-Tarde { background: #fbcfe8 !important; }
-    .bg-CENA { background: #d8b4fe !important; border: 1px solid #c4b5fd; color: #111827 !important; }
 .bg-L { background: var(--white) !important; border: 1px solid #e5e7eb; }
     .bg-Vacaciones { background: #fed7aa !important; }
     .bg-Cumpleaños { background: #f9a8d4 !important; }
@@ -297,81 +295,9 @@
       padding: 15px;
       backdrop-filter: blur(4px);
     }
-
+    
     .modal.active {
       display: flex;
-    }
-
-    /* ===== TOAST ===== */
-    #toastContainer {
-      position: fixed;
-      bottom: 90px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 99999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      pointer-events: none;
-      width: max-content;
-      max-width: calc(100vw - 32px);
-    }
-    .toast-item {
-      background: #0f172a;
-      color: #fff;
-      padding: 10px 18px;
-      border-radius: 14px;
-      font-size: 12px;
-      font-weight: 800;
-      box-shadow: 0 8px 28px rgba(0,0,0,0.28);
-      border: 1px solid rgba(255,255,255,0.1);
-      animation: toastIn 0.25s cubic-bezier(.34,1.56,.64,1) both, toastOut 0.3s ease 2.3s both;
-      white-space: nowrap;
-    }
-    @keyframes toastIn { from { opacity:0; transform:translateY(12px) scale(0.92); } to { opacity:1; transform:none; } }
-    @keyframes toastOut { from { opacity:1; } to { opacity:0; transform:translateY(8px); } }
-
-    /* ===== SUMMARY MEJORADO ===== */
-    .stat-card {
-      background: #fff;
-      border-radius: 20px;
-      padding: 16px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      border: 1px solid #f1f5f9;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .stat-card-label {
-      font-size: 10px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #94a3b8;
-    }
-    .stat-card-value {
-      font-size: 26px;
-      font-weight: 900;
-      color: #0f172a;
-      line-height: 1;
-    }
-    .stat-card-sub {
-      font-size: 11px;
-      font-weight: 700;
-      color: #64748b;
-    }
-    .progress-bar-wrap {
-      height: 6px;
-      background: #e2e8f0;
-      border-radius: 99px;
-      margin-top: 6px;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width 0.6s cubic-bezier(.34,1.56,.64,1);
     }
     
     /* Tabs */
@@ -685,17 +611,7 @@
     .btab.btab-active .btab-line { background: #2563eb; width: 28px; }
 
     /* Espacio para el tab bar inferior */
-    body {
-      padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px));
-      scroll-padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
-    }
-    #bottomTabs {
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
-    #view-summary,
-    #view-settings {
-      padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
-    }
+    body { padding-bottom: 68px; }
 
     /* Encabezado de días de la semana */
     #weekHeader .wday {
@@ -792,6 +708,10 @@
       cursor: pointer;
       font: inherit;
       font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+      vertical-align: middle;
     }
     .month-picker-trigger:focus-visible {
       outline: 2px solid rgba(255,255,255,0.45);
@@ -855,7 +775,6 @@
       display: flex;
       flex-direction: column;
       min-height: 0;
-      overflow: hidden;
     }
     #weekHeader {
       flex: 0 0 auto;
@@ -880,7 +799,7 @@
 <body class="bg-gray-100">
 
 <!-- Top bar (rediseñado: 1 fila compacta) -->
-<div id="topBar" class="bg-[#1e293b] text-white px-3 py-2 sticky top-0 z-50 shadow-lg" style="padding-top:max(8px, env(safe-area-inset-top, 0px));">
+<div id="topBar" class="bg-[#1e293b] text-white px-3 py-2 sticky top-0 z-50 shadow-lg">
   <div class="flex items-center gap-2">
 
     <!-- Dot de sync: tap para abrir cuenta -->
@@ -984,7 +903,6 @@
       <div class="text-[9px] font-black uppercase text-gray-400 tracking-widest mb-2">Datos</div>
       <button onclick="openProfilesModal(); closeMenu();" class="w-full p-3 bg-white/10 hover:bg-white/15 rounded-xl font-black text-[11px] mb-2">👤 Perfiles de usuario</button>
       <button onclick="openImportModal(); closeMenu();" class="w-full p-3 bg-sky-700 hover:bg-sky-800 rounded-xl font-black text-[11px] mb-2">📥 Importar Excel</button>
-      <button onclick="openImageImportModal(); closeMenu();" class="w-full p-3 bg-violet-700 hover:bg-violet-800 rounded-xl font-black text-[11px] mb-2">📷 Importar desde Imagen</button>
       <button onclick="showExportModal(); closeMenu();" class="w-full p-3 bg-white/10 hover:bg-white/15 rounded-xl font-black text-[11px]">📋 Exportar calendario</button>
     </div>
 
@@ -1045,82 +963,36 @@
   <div id="calendar" class="calendar-grid"></div>
 </div>
 
-<!-- Summary -->
+<!-- Summary - CORREGIDO: Solo categorías usadas en el mes -->
 <div id="view-summary" class="view-section p-4 md:p-5 bg-gray-50 min-h-screen">
   <div class="space-y-4 md:space-y-5">
-
-    <!-- Categorías dinámicas -->
-    <div id="summary-categories" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4"></div>
-
-    <!-- Tarjetas de estadísticas clave -->
-    <div class="grid grid-cols-2 gap-3">
-      <div id="statCardWorked" class="stat-card">
-        <div class="stat-card-label">Días trabajados</div>
-        <div class="stat-card-value" id="worked-days">0</div>
-        <div class="stat-card-sub">0 hrs totales</div>
-        <div class="progress-bar-wrap"><div class="progress-bar-fill bg-blue-500" id="workProgressFill" style="width:0%"></div></div>
-      </div>
-      <div id="statCardFree" class="stat-card">
-        <div class="stat-card-label">Días libres</div>
-        <div class="stat-card-value" id="free-days">0</div>
-        <div class="stat-card-sub" id="free-hours">0 hrs de descanso</div>
-        <div class="progress-bar-wrap"><div class="progress-bar-fill bg-emerald-400" id="freeProgressFill" style="width:0%"></div></div>
-      </div>
-      <div id="statCardAvg" class="stat-card">
-        <div class="stat-card-label">Promedio diario</div>
-        <div class="stat-card-value" id="avg-hours">0h</div>
-        <div class="stat-card-sub">por día trabajado</div>
-      </div>
-      <div id="statCardVac" class="stat-card">
-        <div class="stat-card-label">Vacaciones</div>
-        <div class="stat-card-value" id="vac-days">0</div>
-        <div class="stat-card-sub">días de vacaciones</div>
-      </div>
+    <div id="summary-categories" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+      <!-- Las categorías se generarán dinámicamente aquí -->
     </div>
 
-    <!-- Barra de progreso del mes -->
-    <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-      <div class="flex justify-between items-center mb-2">
-        <span class="text-[11px] font-black text-gray-500 uppercase tracking-wide">Progreso del mes</span>
-        <span id="workProgressLabel" class="text-[11px] font-black text-blue-600">0% del mes trabajado</span>
+    <div class="bg-gradient-to-r from-emerald-500 to-teal-600 p-3 md:p-4 rounded-3xl text-white text-center shadow-xl">
+      <p class="text-[11px] md:text-xs font-black uppercase opacity-90 mb-1">Días de Descanso</p>
+      <h2 id="total-off" class="text-3xl md:text-4xl font-black mb-2">0</h2>
+      <div class="flex flex-wrap justify-center gap-3 text-[11px] font-black w-full max-w-3xl mx-auto">
+        <div class="bg-white/20 px-3 py-2 rounded-2xl w-44 md:w-48"><div class="opacity-95">Libres</div><div id="free-days" class="text-xl md:text-2xl font-black leading-none">0</div></div>
+        <div class="bg-white/20 px-3 py-2 rounded-2xl w-44 md:w-48"><div class="opacity-95">Vacaciones</div><div id="vac-days" class="text-xl md:text-2xl font-black leading-none">0</div></div>
+<div class="bg-white/20 px-3 py-2 rounded-2xl w-44 md:w-48"><div class="opacity-95">Asuetos Trab.</div><div id="holiday-worked" class="text-xl md:text-2xl font-black leading-none">0</div></div>
       </div>
-      <div class="progress-bar-wrap" style="height:8px;">
-        <div class="progress-bar-fill bg-gradient-to-r from-blue-500 to-indigo-600" id="workProgressFill2" style="width:0%"></div>
-      </div>
-      <div class="flex justify-between mt-2 text-[10px] font-bold text-gray-400">
-        <span>Localidad: <span id="profile-loc" class="text-gray-700">—</span></span>
-        <span>Total: <span id="total-days" class="text-gray-700">30</span> días · <span id="total-holidays" class="text-red-500">0</span> asuetos</span>
-      </div>
+      <p class="text-[11px] mt-2 font-bold opacity-90">
+        * Asueto laborado solo cuenta si aplica a la localidad del perfil.
+      </p>
     </div>
 
-    <!-- Panel descanso compacto -->
-    <div class="bg-gradient-to-r from-emerald-500 to-teal-600 p-4 rounded-3xl text-white shadow-xl">
-      <p class="text-[10px] font-black uppercase opacity-80 mb-1 tracking-widest">Días de Descanso</p>
-      <h2 id="total-off" class="text-4xl font-black mb-3">0</h2>
-      <div class="flex flex-wrap gap-2">
-        <div class="bg-white/20 backdrop-blur px-4 py-2.5 rounded-2xl flex-1 min-w-[110px]">
-          <div class="text-[9px] font-black uppercase opacity-75 mb-0.5">Libres</div>
-          <div class="text-2xl font-black leading-none" id="free-days2">0</div>
-          <div class="text-[10px] font-bold opacity-80 mt-0.5" id="free-hours2">0 hrs</div>
-        </div>
-        <div class="bg-white/20 backdrop-blur px-4 py-2.5 rounded-2xl flex-1 min-w-[110px]">
-          <div class="text-[9px] font-black uppercase opacity-75 mb-0.5">Vacaciones</div>
-          <div class="text-2xl font-black leading-none" id="vac-days2">0</div>
-        </div>
-        <div class="bg-white/20 backdrop-blur px-4 py-2.5 rounded-2xl flex-1 min-w-[110px]">
-          <div class="text-[9px] font-black uppercase opacity-75 mb-0.5">Asuetos Trab.</div>
-          <div class="text-2xl font-black leading-none" id="holiday-worked">0</div>
-        </div>
+    <div class="bg-white p-5 rounded-3xl shadow-sm">
+      <h3 class="text-[13px] md:text-[14px] font-black text-gray-700 uppercase mb-4">📈 Resumen del Mes</h3>
+      <div class="space-y-2">
+        <div class="flex justify-between"><span class="text-[12px] font-bold text-gray-600">Localidad perfil:</span><span id="profile-loc" class="font-black text-gray-900 text-[13px]">San Salvador</span></div>
+        <div class="flex justify-between"><span class="text-[12px] font-bold text-gray-600">Días trabajados:</span><span id="worked-days" class="font-black text-gray-900">0</span></div>
+        <div class="flex justify-between"><span class="text-[12px] font-bold text-gray-600">Promedio diario:</span><span id="avg-hours" class="font-black text-gray-900">0.0h</span></div>
+        <div class="flex justify-between"><span class="text-[12px] font-bold text-gray-600">Total días mes:</span><span id="total-days" class="font-black text-gray-900">30</span></div>
+        <div class="flex justify-between"><span class="text-[12px] font-bold text-gray-600">Asuetos en mes:</span><span id="total-holidays" class="font-black text-red-600">0</span></div>
       </div>
-      <p class="text-[10px] mt-2 font-bold opacity-70">* Asueto laborado cuenta si aplica a tu localidad.</p>
     </div>
-
-    <!-- IDs legacy ocultos para compatibilidad -->
-    <div class="hidden">
-      <span id="worked-days-legacy"></span>
-      <span id="total-holidays"></span>
-    </div>
-
   </div>
 </div>
 
@@ -1646,16 +1518,68 @@
   </div>
 </div>
 
+<!-- Modal Fusionar Perfiles -->
+<div id="mergeProfilesModal" class="modal">
+  <div class="bg-white w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl border border-gray-100 mx-2" style="max-height:90vh;overflow-y:auto;">
+    <div class="bg-[#1e3a5f] text-white px-5 py-4 flex items-center justify-between">
+      <div>
+        <div class="font-black text-[13px] uppercase tracking-widest">🔗 Fusionar perfiles</div>
+        <div class="text-[11px] text-white/70 mt-0.5">Une dos perfiles en uno solo, conservando todos los meses</div>
+      </div>
+      <button onclick="closeMergeModal()" class="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-lg flex-shrink-0">✕</button>
+    </div>
+    <div class="p-5 space-y-4">
+
+      <div>
+        <div class="text-[10px] font-black uppercase text-gray-500 mb-1">Perfil origen (será eliminado)</div>
+        <select id="mergeSourceSel" onchange="renderMergePreview()" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-[12px] font-bold text-gray-900"></select>
+      </div>
+
+      <div class="text-center text-gray-400 text-lg select-none">⬇ se fusiona hacia ⬇</div>
+
+      <div>
+        <div class="text-[10px] font-black uppercase text-gray-500 mb-1">Perfil destino (el que permanece)</div>
+        <select id="mergeTargetSel" onchange="renderMergePreview()" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-[12px] font-bold text-gray-900"></select>
+      </div>
+
+      <div>
+        <div class="text-[10px] font-black uppercase text-gray-500 mb-1">Nombre final del perfil fusionado</div>
+        <select id="mergeKeepNameSel" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-[12px] font-bold text-gray-900"></select>
+      </div>
+
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3">
+        <div class="text-[10px] font-black uppercase text-amber-800 mb-2">Cuando un mismo día tiene datos en ambos perfiles</div>
+        <div class="space-y-1.5">
+          <label class="flex items-center gap-2 text-[11px] font-bold text-gray-700 cursor-pointer">
+            <input type="radio" name="mergeConflict" value="target" checked> Conservar los del perfil destino
+          </label>
+          <label class="flex items-center gap-2 text-[11px] font-bold text-gray-700 cursor-pointer">
+            <input type="radio" name="mergeConflict" value="source"> Conservar los del perfil origen
+          </label>
+        </div>
+      </div>
+
+      <div id="mergePreview" class="bg-gray-50 border border-gray-200 rounded-2xl p-3 text-[11px] font-bold text-gray-600">
+        Selecciona dos perfiles para ver el resumen.
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="closeMergeModal()" class="flex-1 p-3 rounded-2xl bg-gray-100 hover:bg-gray-200 text-[11px] font-black uppercase">Cancelar</button>
+        <button onclick="executeMerge()" class="flex-1 p-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase">🔗 Fusionar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Profiles - CORREGIDO: Nombres visibles en selects -->
-<div id="profilesModal" class="modal" style="overflow-y:auto;">
-  <div class="bg-white w-full max-w-3xl rounded-3xl md:rounded-[40px] p-4 md:p-6 lg:p-8 shadow-2xl mx-2 my-auto">
+<div id="profilesModal" class="modal">
+  <div class="bg-white w-full max-w-3xl rounded-3xl md:rounded-[40px] p-4 md:p-6 lg:p-8 shadow-2xl mx-2">
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3">
       <div>
         <h3 class="font-black uppercase text-base md:text-lg">👤 Gestión de Perfiles</h3>
         <p class="text-[11px] text-gray-500 font-bold">Crear, editar, asignar localidad o eliminar perfiles.</p>
       </div>
-      <div class="flex gap-2 flex-wrap">
-        <button onclick="detectDuplicateProfiles()" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black uppercase whitespace-nowrap">🔍 Detectar duplicados</button>
+      <div class="flex gap-2">
         <button onclick="deleteAllProfilesExceptAdmin()" class="px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-[10px] font-black uppercase whitespace-nowrap">🧹 Eliminar todos (dejar ADMIN)</button>
         <button onclick="closeProfilesModal()" class="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-[10px] font-black uppercase whitespace-nowrap">Cerrar</button>
       </div>
@@ -1684,102 +1608,6 @@
         </div>
         <div id="profilesList" class="max-h-[300px] md:max-h-[360px] overflow-y-auto space-y-2"></div>
       </div>
-    </div>
-
-    <!-- Sección de duplicados -->
-    <div id="duplicateProfilesSection" class="hidden mt-4 bg-amber-50 border border-amber-200 rounded-3xl p-4">
-      <h4 class="text-[12px] font-black text-amber-800 uppercase mb-3">⚠️ Perfiles Duplicados Detectados</h4>
-      <div id="duplicateProfilesList" class="space-y-3"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Importar desde Imagen -->
-<div id="imageImportModal" class="modal">
-  <div class="bg-white w-full max-w-3xl rounded-3xl md:rounded-[40px] p-4 md:p-6 shadow-2xl mx-2 max-h-[90vh] overflow-y-auto overscroll-contain">
-    <div class="w-14 h-14 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 mx-auto mb-4 flex items-center justify-center">
-      <span class="text-white text-2xl">📷</span>
-    </div>
-    <h3 class="font-black text-center uppercase text-base mb-1">Importar desde Imagen</h3>
-    <p class="text-[11px] text-gray-500 font-bold text-center mb-4">Ideal para calendarios tipo captura. Detecta el nombre dentro de cada día y propone el turno para el perfil actual.</p>
-
-    <div class="space-y-4">
-      <div class="rounded-2xl border border-violet-100 bg-violet-50 px-4 py-3">
-        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div class="text-[10px] font-black uppercase tracking-wide text-violet-500">Perfil actual</div>
-            <div id="imgImportProfileName" class="text-[12px] font-black text-violet-900">—</div>
-          </div>
-          <div class="text-[10px] font-bold text-violet-700">La coincidencia prioriza apellido(s) y muestra vista previa antes de aplicar.</div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div>
-          <label class="text-[11px] font-bold text-gray-600 block mb-1">Mes</label>
-          <select id="imgImportMonth" class="w-full bg-gray-50 border-gray-200 text-gray-900"></select>
-        </div>
-        <div>
-          <label class="text-[11px] font-bold text-gray-600 block mb-1">Año</label>
-          <select id="imgImportYear" class="w-full bg-gray-50 border-gray-200 text-gray-900"></select>
-        </div>
-        <div>
-          <label class="text-[11px] font-bold text-gray-600 block mb-1">Turno a aplicar</label>
-          <select id="imgImportShift" class="w-full bg-gray-50 border-gray-200 text-gray-900"></select>
-        </div>
-        <div>
-          <label class="text-[11px] font-bold text-gray-600 block mb-1">Modo</label>
-          <select id="imgImportMode" class="w-full bg-gray-50 border-gray-200 text-gray-900">
-            <option value="replace">Reemplazar días detectados</option>
-            <option value="merge">Solo llenar días vacíos / libres</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label class="text-[11px] font-bold text-gray-600 block mb-2">Imagen (JPG, PNG, BMP, TIFF)</label>
-        <input type="file" id="imageImportFile" accept="image/*" class="w-full bg-gray-50 border-gray-200" onchange="previewImportImage(this)">
-      </div>
-
-      <div id="imgPreviewBox" class="hidden space-y-2">
-        <img id="imgPreview" class="w-full rounded-2xl border border-gray-200 max-h-52 object-contain bg-gray-50"/>
-        <p class="text-[10px] font-bold text-gray-400">Consejo: mientras más recta y nítida esté la captura, mejor detectará los días y apellidos.</p>
-      </div>
-
-      <button onclick="runImageOCR()" class="w-full p-3 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-black uppercase text-[11px]">
-        🔎 Analizar imagen y detectar días
-      </button>
-
-      <div id="ocrStatus" class="text-[11px] font-bold text-center text-gray-500 hidden"></div>
-
-      <div id="ocrResultsBox" class="hidden bg-gray-50 border border-gray-200 rounded-2xl p-4">
-        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-3">
-          <div>
-            <p class="text-[11px] font-black text-gray-700 uppercase">Días detectados</p>
-            <span id="ocrDetectedCount" class="text-[10px] font-bold text-gray-500"></span>
-          </div>
-          <div class="flex gap-2">
-            <button type="button" onclick="setAllOCRSelections(true)" class="px-3 py-2 rounded-xl bg-white border border-gray-200 text-[10px] font-black uppercase text-gray-700">Todos</button>
-            <button type="button" onclick="setAllOCRSelections(false)" class="px-3 py-2 rounded-xl bg-white border border-gray-200 text-[10px] font-black uppercase text-gray-700">Ninguno</button>
-          </div>
-        </div>
-
-        <div id="ocrAnalysisSummary" class="hidden mb-3 rounded-2xl border border-indigo-100 bg-white px-3 py-2 text-[10px] font-bold text-indigo-700"></div>
-        <div id="ocrResultsList" class="max-h-[260px] overflow-y-auto space-y-2 mb-3"></div>
-
-        <details class="mt-2">
-          <summary class="text-[10px] font-black text-gray-400 uppercase cursor-pointer">Ver texto OCR crudo</summary>
-          <pre id="ocrRawText" class="text-[9px] text-gray-500 font-mono mt-2 whitespace-pre-wrap max-h-32 overflow-y-auto bg-white border border-gray-100 rounded-xl p-2"></pre>
-        </details>
-
-        <button onclick="applyOCRResults()" class="w-full mt-3 p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black uppercase text-[11px]">
-          🚀 Aplicar días seleccionados
-        </button>
-      </div>
-
-      <button onclick="closeImageImportModal()" class="w-full p-3 text-gray-400 font-bold uppercase text-[10px] hover:text-gray-600">
-        Cancelar
-      </button>
     </div>
   </div>
 </div>
@@ -1812,8 +1640,6 @@ try {
 }
 
 normalizeEnabledFlags();
-ensureCanonicalCoreShiftsAllUsers();
-migrateLegacyShiftPropertyEntriesAllUsers();
 
 function normalizeEnabledFlags(){
   try{
@@ -1862,8 +1688,6 @@ function createDefaultDB() {
         config:{
           'Mañana': { label:'Mañana', color:'Mañana', cat:'work', in:'06:00', out:'14:00', enabled:true },
           'Tarde': { label:'Tarde', color:'Tarde', cat:'work', in:'14:00', out:'22:00', enabled:true },
-          'CENA': { label:'CENA', note:'06:00 a 14:00', color:'CENA', cat:'work', in:'06:00', out:'14:00', enabled:true },
-          '16hrs': { label:'16hrs', note:'06:00 a 22:00', color:'16hrs', cat:'guardia', in:'06:00', out:'22:00', enabled:true },
           'Noche': { label:'Noche', color:'indigo', cat:'work', in:'22:00', out:'06:00', enabled:true },
           'Diurno': { label:'Diurno', color:'ambar', cat:'office', in:'08:00', out:'17:00', enabled:true },
           'Cumpleaños': { label:'Cumpleaños', color:'Cumpleaños', cat:'cumple', in:'00:00', out:'00:00', enabled:false },
@@ -1877,119 +1701,61 @@ function createDefaultDB() {
 }
 
 
-// Asegurar consistencia de turnos base en todos los perfiles
-function ensureCanonicalCoreShiftsForUser(user){
-  if(!user) return;
-  if(!user.config) user.config = {};
-
-  const defs = {
-    'Mañana': { label:'Mañana', color:'Mañana', cat:'work', in:'06:00', out:'14:00', enabled:true },
-    'Tarde': { label:'Tarde', color:'Tarde', cat:'work', in:'14:00', out:'22:00', enabled:true },
-    'CENA': { label:'CENA', note:'06:00 a 14:00', color:'CENA', cat:'work', in:'06:00', out:'14:00', enabled:true },
-    '16hrs': { label:'16hrs', note:'06:00 a 22:00', color:'16hrs', cat:'guardia', in:'06:00', out:'22:00', enabled:true },
-    'L': { label:'L', note:'LIBRE', color:'L', cat:'off', in:'06:00', out:'14:00', enabled:true },
-    'Vacaciones': { label:'Vac', color:'Vacaciones', cat:'off', in:'00:00', out:'00:00', enabled:true },
-    'Ausencia': { label:'Ausencia', color:'Ausencia', cat:'ausencia', in:'00:00', out:'00:00', enabled:false }
-  };
-
-  Object.keys(defs).forEach(key => {
-    const def = defs[key];
-    if(!user.config[key]){
-      user.config[key] = { ...def };
-      return;
-    }
-    const cfg = user.config[key];
-    Object.keys(def).forEach(prop => {
-      if(cfg[prop] === undefined || cfg[prop] === null || cfg[prop] === ''){
-        cfg[prop] = def[prop];
-      }
-    });
+// Asegurar consistencia: el turno L siempre debe tener nota "LIBRE" en todos los perfiles
+try{
+  Object.values((db && db.users) ? db.users : {}).forEach(u=>{
+    if(!u) return;
+    if(!u.config) u.config = {};
+    if(!u.config.L) u.config.L = { label:'L', color:'L', cat:'off', in:'00:00', out:'00:00', enabled:true };
+    u.config.L.note = 'LIBRE';
+    u.config.L.in = '06:00';
+    u.config.L.out = '14:00';
   });
 
-  user.config.L.note = 'LIBRE';
-  user.config.L.in = '06:00';
-  user.config.L.out = '14:00';
-  user.config.CENA.label = 'CENA';
-  user.config.CENA.note = '06:00 a 14:00';
-  user.config.CENA.in = '06:00';
-  user.config.CENA.out = '14:00';
-  user.config.CENA.color = user.config.CENA.color || 'CENA';
-  user.config.CENA.cat = user.config.CENA.cat || 'work';
-  user.config['16hrs'].label = '16hrs';
-  user.config['16hrs'].note = '06:00 a 22:00';
-  user.config['16hrs'].in = '06:00';
-  user.config['16hrs'].out = '22:00';
-  user.config['16hrs'].color = user.config['16hrs'].color || '16hrs';
-  user.config['16hrs'].cat = user.config['16hrs'].cat || 'guardia';
-
-  ['Mañana','Tarde','CENA','16hrs','L','Vacaciones'].forEach(key => {
-    if(user.config[key]) user.config[key].enabled = true;
-  });
-}
-
-function ensureCanonicalCoreShiftsAllUsers(){
-  try{
-    if(!db || !db.users) return;
-    Object.values(db.users).forEach(user => ensureCanonicalCoreShiftsForUser(user));
-  }catch(e){
-    console.warn('ensureCanonicalCoreShiftsAllUsers error', e);
-  }
-}
-
-function buildSimpleDayFromShiftKeyForUser(user, shiftKey, existingInfo){
-  ensureCanonicalCoreShiftsForUser(user);
-  const sk = String(shiftKey || 'L').trim() || 'L';
-  const cfg = user?.config?.[sk] || user?.config?.L || { in:'00:00', out:'00:00', note:'', label:sk };
-  const tIn = cfg.in || '00:00';
-  const tOut = cfg.out || '00:00';
-  const hrs = calculateHours(tIn, tOut);
-  const note = (cfg.note || '').toString().trim() || ((tIn !== '00:00' || tOut !== '00:00') ? `${tIn} a ${tOut}` : (cfg.label || sk || '').toUpperCase());
-  const data = { mode:'simple', s: sk, tIn, tOut, h: hrs, n: note };
-  if(existingInfo && existingInfo.photoData) data.photoData = existingInfo.photoData;
-  if(existingInfo && existingInfo.imageImportMeta) data.imageImportMeta = existingInfo.imageImportMeta;
-  return data;
-}
-
-function migrateLegacyShiftPropertyEntriesAllUsers(){
-  try{
-    if(!db || !db.users) return;
-    Object.values(db.users).forEach(user => {
-      ensureCanonicalCoreShiftsForUser(user);
-      if(!user || !user.data) return;
-      Object.keys(user.data).forEach(key => {
-        const d = user.data[key];
-        if(!d || typeof d !== 'object') return;
-
-        if((!d.mode || !d.s) && typeof d.shift === 'string' && d.shift.trim()){
-          const rebuilt = buildSimpleDayFromShiftKeyForUser(user, d.shift.trim(), d);
-          if(String(d.n || d.note || '').trim()) rebuilt.n = String(d.n || d.note).trim();
-          if(d.imageImportMeta) rebuilt.imageImportMeta = d.imageImportMeta;
-          user.data[key] = rebuilt;
-          return;
-        }
-
-        if(d.mode === 'simple' && d.s){
-          const rebuilt = buildSimpleDayFromShiftKeyForUser(user, d.s, d);
-          user.data[key] = {
-            ...rebuilt,
-            ...d,
-            mode:'simple',
-            s: d.s,
-            tIn: d.tIn || rebuilt.tIn,
-            tOut: d.tOut || rebuilt.tOut,
-            h: (Number(d.h) > 0 ? Number(d.h) : rebuilt.h),
-            n: String(d.n || '').trim() || rebuilt.n
-          };
+// Limpieza: eliminar turnos/categorías específicos (CENA, 16hrs) para generalizar la app.
+// Si existían en datos históricos, se convierten a LIBRE (L).
+try{
+  Object.values((db && db.users) ? db.users : {}).forEach(u=>{
+    if(!u) return;
+    if(!u.config) u.config = {};
+    // eliminar definiciones
+    if(u.config['CENA']) delete u.config['CENA'];
+    if(u.config['16hrs']) delete u.config['16hrs'];
+    // migrar días guardados
+    if(u.data){
+      Object.keys(u.data).forEach(k=>{
+        const d = u.data[k];
+        if(!d) return;
+        if(d.mode === 'simple'){
+          if(d.s === 'CENA' || d.s === '16hrs'){
+            d.s = 'L';
+            d.tIn = '06:00'; d.tOut = '14:00';
+            d.h = 8;
+            d.n = d.n && d.n.trim() ? d.n : 'LIBRE';
+          }
+        } else if(d.mode === 'mixto'){
+          let changed=false;
+          if(d.t === 'CENA' || d.t === '16hrs'){ d.t='L'; changed=true; }
+          if(d.b === 'CENA' || d.b === '16hrs'){ d.b='L'; changed=true; }
+          if(changed){
+            // mantener notas si existen; si no, poner LIBRE
+            d.noteTop = d.noteTop && d.noteTop.trim() ? d.noteTop : 'LIBRE';
+            d.noteBottom = d.noteBottom && d.noteBottom.trim() ? d.noteBottom : 'LIBRE';
+            d.n = `${d.noteTop} | ${d.noteBottom}`;
+          }
         }
       });
-    });
-  }catch(e){
-    console.warn('migrateLegacyShiftPropertyEntriesAllUsers error', e);
-  }
-}
+    }
+  });
 
-ensureCanonicalCoreShiftsAllUsers();
-migrateLegacyShiftPropertyEntriesAllUsers();
+  // eliminar categoría 'CENA' si existía
+  if(db && db.categories){
+    if(db.categories.sena) delete db.categories.sena;
+  }
+}catch(e){}
+
+
+}catch(e){}
 
 function saveDB(){ 
   try {
@@ -2095,25 +1861,6 @@ function buildDefaultSimpleDay(user, shiftKey){
   return { mode:'simple', s: sk, tIn, tOut, h: hrs, n: note };
 }
 
-function getConfiguredShiftHours(user, shiftKey){
-  try{
-    const sh = user?.config?.[shiftKey] || null;
-    if(!sh){
-      return String(shiftKey || '').toUpperCase() === 'L' ? 8 : 0;
-    }
-    const hrs = calculateHours(sh.in || '00:00', sh.out || '00:00');
-    if(hrs > 0) return hrs;
-    return String(shiftKey || '').toUpperCase() === 'L' ? 8 : 0;
-  }catch(e){
-    return String(shiftKey || '').toUpperCase() === 'L' ? 8 : 0;
-  }
-}
-
-function normalizeShiftHoursForSummary(user, shiftKey, storedHours){
-  const raw = Number(storedHours) || 0;
-  if(raw > 0) return raw;
-  return getConfiguredShiftHours(user, shiftKey);
-}
 
 
 // ====== Helpers: prioridad de edición (nota vs horario) ======
@@ -2320,35 +2067,6 @@ function ensureUserExists(nameUpper){
 
 function dayKey(y, m1, d){ 
   return `${y}-${m1}-${d}`; 
-}
-
-function isEffectivelyEmptyDayData(info){
-  if(!info || typeof info !== 'object') return true;
-  const hasPhoto = !!info.photoData;
-  const note = String(info.n || info.note || info.comment || '').trim();
-  const hasMix = info.mode === 'mixto' || !!(info.t || info.b || info.top || info.bottom || info.noteTop || info.noteBottom);
-  const shift = String(info.s || info.shift || '').trim();
-  if(hasPhoto || note || hasMix) return false;
-  return !shift || shift === 'L';
-}
-
-function getDayPrimaryShiftKey(info){
-  if(!info || typeof info !== 'object') return 'L';
-  if(info.mode === 'mixto'){
-    return String(info.t || info.top || info.b || info.bottom || 'L').trim() || 'L';
-  }
-  return String(info.s || info.shift || 'L').trim() || 'L';
-}
-
-function getDayPrimaryShiftLabel(info, SHIFTS){
-  const key = getDayPrimaryShiftKey(info);
-  return (SHIFTS && SHIFTS[key] && SHIFTS[key].label) ? SHIFTS[key].label : key || 'L';
-}
-
-function getDayPrimaryShiftColor(info, SHIFTS){
-  const key = getDayPrimaryShiftKey(info);
-  const shift = (SHIFTS && SHIFTS[key]) ? SHIFTS[key] : null;
-  return getColorValue((shift && shift.color) ? shift.color : key);
 }
 
 function getColorValue(colorName){
@@ -2567,9 +2285,10 @@ function updateMonthDisplay(){
   if (yearSelect) yearSelect.value = y;
 }
 
-function changeMonth(v){ 
-  current.setMonth(current.getMonth() + v); 
-  updateMonthDisplay(); 
+function changeMonth(v){
+  // Usar new Date(y, m, 1) para evitar overflow cuando el día actual es 29-31
+  current = new Date(current.getFullYear(), current.getMonth() + v, 1);
+  updateMonthDisplay();
   render();
   renderSummaryCategories();
   calcSummary();
@@ -2579,9 +2298,8 @@ function jumpToDate(){
   const monthSelect = document.getElementById('selectMonth');
   const yearSelect = document.getElementById('selectYear');
   if (monthSelect && yearSelect) {
-    current.setMonth(parseInt(monthSelect.value));
-    current.setFullYear(parseInt(yearSelect.value));
-    updateMonthDisplay(); 
+    current = new Date(parseInt(yearSelect.value), parseInt(monthSelect.value), 1);
+    updateMonthDisplay();
     render();
     renderSummaryCategories();
     calcSummary();
@@ -2631,11 +2349,8 @@ function showView(view){
   const activeView = document.getElementById('view-' + target);
   if (activeView) {
     activeView.classList.add('view-active');
-    activeView.style.display = target === 'calendar' ? 'flex' : 'block';
+    activeView.style.display = 'block';
   }
-
-  // Lock body scroll on calendar to prevent page scrolling
-  document.body.style.overflowY = target === 'calendar' ? 'hidden' : '';
 
   document.querySelectorAll('#bottomTabs .btab').forEach(btn => btn.classList.remove('btab-active'));
   const activeBtn = document.getElementById('btab-' + target);
@@ -3114,68 +2829,56 @@ function calcSummary(){
     catDays[catId] = 0;
   });
   
-  let freeDays = 0, vacDays = 0, workedDays = 0, holidayWorked = 0, freeHours = 0;
+  let freeDays = 0, vacDays = 0, workedDays = 0, holidayWorked = 0;
   const daysInMonth = new Date(y, m0 + 1, 0).getDate();
-
+  freeDays = 0;
+  
   const applicableHolidays = countApplicableHolidaysInMonth(y, m0, user.locality);
-  const defaultFreeHours = getConfiguredShiftHours(user, 'L') || 8;
-
-  // Procesar días del mes
+  
+  // Procesar días del mes (si no hay dato, se asume LIBRE)
   for(let day = 1; day <= daysInMonth; day++){
     const key = dayKey(y, m1, day);
     const d = user.data[key] || buildDefaultSimpleDay(user, 'L');
+    const date = new Date(y, m0, day);
+    const dow = date.getDay();
     const isHoliday = db.holidays[key] && holidayApplies(db.holidays[key].location, user.locality);
-
-    if (d.mode === 'mixto') {
+if (d.mode === 'mixto') {
       const topCat = SHIFTS[d.t]?.cat;
       const botCat = SHIFTS[d.b]?.cat;
-      const topHours = (topCat && categories[topCat]) ? normalizeShiftHoursForSummary(user, d.t, d.hrsTop) : 0;
-      const botHours = (botCat && categories[botCat]) ? normalizeShiftHoursForSummary(user, d.b, d.hrsBottom) : 0;
 
-      if (isHoliday && ((topCat && topCat !== 'off') || (botCat && botCat !== 'off'))) holidayWorked++;
+      if (isHoliday && (topCat || botCat)) holidayWorked++;
 
       if (topCat && categories[topCat]) {
-        catHours[topCat] += topHours;
+        catHours[topCat] += (d.hrsTop || 0);
         catDays[topCat]++;
         if (topCat !== 'off') workedDays++;
+        else {
+          if ((d.t || '') === 'Vacaciones') vacDays++;
+          else freeDays++;
+        }
       }
 
       if (botCat && categories[botCat]) {
-        catHours[botCat] += botHours;
+        catHours[botCat] += (d.hrsBottom || 0);
         catDays[botCat]++;
         if (botCat !== 'off') workedDays++;
-      }
-
-      const topIsOff = !topCat || topCat === 'off';
-      const botIsOff = !botCat || botCat === 'off';
-      if (topIsOff && botIsOff) {
-        const isVac = (d.t === 'Vacaciones') || (d.b === 'Vacaciones');
-        if (isVac) {
-          vacDays++;
-        } else {
-          freeDays++;
-          const dayFreeHours = (topHours + botHours) > 0 ? (topHours + botHours) : defaultFreeHours;
-          freeHours += dayFreeHours;
+        else {
+          if ((d.b || '') === 'Vacaciones') vacDays++;
+          else freeDays++;
         }
       }
     } else {
       const cat = SHIFTS[d.s]?.cat;
-      const normalizedHours = (cat && categories[cat]) ? normalizeShiftHoursForSummary(user, d.s, d.h) : 0;
-
       if (cat && categories[cat]) {
-        catHours[cat] += normalizedHours;
+        catHours[cat] += (d.h || 0);
         catDays[cat]++;
 
         if (cat !== 'off') {
           workedDays++;
           if (isHoliday) holidayWorked++;
         } else {
-          if ((d.s || '') === 'Vacaciones') {
-            vacDays++;
-          } else {
-            freeDays++;
-            freeHours += normalizedHours > 0 ? normalizedHours : defaultFreeHours;
-          }
+          if ((d.s || '') === 'Vacaciones') vacDays++;
+          else freeDays++;
         }
       }
     }
@@ -3195,10 +2898,8 @@ function calcSummary(){
   const elements = {
     'total-off': freeDays + vacDays,
     'free-days': freeDays,
-    'free-days2': freeDays,
     'vac-days': vacDays,
-    'vac-days2': vacDays,
-    'holiday-worked': holidayWorked,
+'holiday-worked': holidayWorked,
     'worked-days': workedDays,
     'total-holidays': applicableHolidays,
     'profile-loc': user.locality || 'San Salvador',
@@ -3210,45 +2911,11 @@ function calcSummary(){
     if (el) el.textContent = value;
   });
   
-  // Calcular totales
+  // Calcular promedio
   const totalHours = Object.values(catHours).reduce((a, b) => a + b, 0);
   const avg = workedDays > 0 ? totalHours / workedDays : 0;
   const avgEl = document.getElementById('avg-hours');
   if (avgEl) avgEl.textContent = `${avg.toFixed(1)}h`;
-
-  const freeHoursRounded = Math.round(freeHours * 10) / 10;
-  const freeHoursText = `${freeHoursRounded % 1 === 0 ? freeHoursRounded.toFixed(0) : freeHoursRounded.toFixed(1)} hrs`;
-  const freeHoursEl = document.getElementById('free-hours');
-  if (freeHoursEl) freeHoursEl.textContent = `${freeHoursText} de descanso`;
-  const freeHoursEl2 = document.getElementById('free-hours2');
-  if (freeHoursEl2) freeHoursEl2.textContent = freeHoursText;
-
-  // Barra de progreso del mes
-  const pct = daysInMonth > 0 ? Math.round((workedDays / daysInMonth) * 100) : 0;
-  const freePct = daysInMonth > 0 ? Math.round(((freeDays + vacDays) / daysInMonth) * 100) : 0;
-  const barFill = document.getElementById('workProgressFill');
-  const barFill2 = document.getElementById('workProgressFill2');
-  const freeFill = document.getElementById('freeProgressFill');
-  const barLabel = document.getElementById('workProgressLabel');
-  if (barFill) barFill.style.width = `${pct}%`;
-  if (barFill2) barFill2.style.width = `${pct}%`;
-  if (freeFill) freeFill.style.width = `${freePct}%`;
-  if (barLabel) barLabel.textContent = `${pct}% del mes trabajado`;
-
-  // Tarjetas stat mejoradas
-  const setCard = (id, val, sub) => {
-    const el = document.getElementById(id);
-    if (el) {
-      const valueEl = el.querySelector('.stat-card-value');
-      const subEl = el.querySelector('.stat-card-sub');
-      if (valueEl) valueEl.textContent = val;
-      if (sub && subEl) subEl.textContent = sub;
-    }
-  };
-  setCard('statCardWorked',  workedDays,           `${totalHours.toFixed(1)} hrs totales`);
-  setCard('statCardFree',    freeDays,             `${freeHoursText} de descanso`);
-  setCard('statCardAvg',     `${avg.toFixed(1)}h`, `promedio por día trabajado`);
-  setCard('statCardVac',     vacDays,              vacDays === 1 ? '1 día de vacaciones' : `${vacDays} días de vacaciones`);
 }
 
 // =========================================================
@@ -4723,59 +4390,96 @@ function createProfile(){
 function renderProfilesList(){
   const container = document.getElementById('profilesList');
   if (!container) return;
-  
+
   container.innerHTML = '';
-  
+
+  // --- Alertas de perfiles similares ---
+  const similar = detectSimilarProfiles();
+  if(similar.length){
+    let warn = `<div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 mb-3">
+      <div class="font-black text-[11px] text-amber-800 mb-2">⚠️ Perfiles posiblemente duplicados:</div>`;
+    similar.forEach(p => {
+      warn += `<div class="flex items-center justify-between gap-2 mb-1 flex-wrap">
+        <span class="text-[10px] text-amber-900 font-bold">"${escapeHTML(p.a)}" ↔ "${escapeHTML(p.b)}"
+          <span class="text-amber-600">(${escapeHTML(p.reason)})</span>
+        </span>
+        <button onclick="openMergeModal(${JSON.stringify(p.a)})"
+          class="px-2 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[9px] font-black uppercase flex-shrink-0">
+          🔗 Fusionar
+        </button>
+      </div>`;
+    });
+    warn += '</div>';
+    container.innerHTML += warn;
+  }
+
+  // --- Tarjetas de perfil ---
+  const MN = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   const keys = Object.keys(db.users).sort();
-  
+
   keys.forEach(u => {
     const user = db.users[u];
     const isCurrent = (u === db.current);
-    
+
+    // Resumen de meses con datos
+    const months = _profileMonthSet(u);
+    const monthCount = months.size;
+    const monthSummary = monthCount === 0
+      ? '<span class="text-gray-400">Sin datos</span>'
+      : [...months].sort().slice(-3).map(ym => {
+          const [y,m] = ym.split('-');
+          return `${MN[parseInt(m)-1]}&nbsp;${y}`;
+        }).join(' · ') + (monthCount > 3 ? ` <span class="text-gray-400">+${monthCount-3} más</span>` : '');
+
     container.innerHTML += `
       <div class="border border-gray-200 rounded-2xl p-3 ${isCurrent ? 'bg-blue-50 border-blue-200' : ''}">
-        <div class="flex items-center justify-between gap-2">
-          <div>
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
             <div class="font-black text-gray-900 text-[12px]">
-              ${escapeHTML(u)} ${isCurrent ? '<span class="ml-2 text-[9px] font-black text-blue-600">(Actual)</span>' : ''}
+              ${escapeHTML(u)}${isCurrent ? ' <span class="text-[9px] font-black text-blue-600">(Actual)</span>' : ''}
             </div>
-            <div class="text-[10px] font-bold text-gray-500">
-              Localidad: <span class="font-black text-gray-800">${escapeHTML(user.locality || 'San Salvador')}</span>
+            <div class="text-[10px] font-bold text-gray-500 mt-0.5">
+              📍 ${escapeHTML(user.locality || 'San Salvador')}
+              &nbsp;·&nbsp; 📅 ${monthSummary}
             </div>
           </div>
-          <div class="flex gap-2">
-            <button onclick="setCurrentProfile('${u}')" class="px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-[10px] font-black uppercase">
-              Usar
-            </button>
+          <div class="flex gap-1.5 flex-wrap justify-end flex-shrink-0">
+            <button onclick="setCurrentProfile(${JSON.stringify(u)})"
+              class="px-2 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-[10px] font-black uppercase">Usar</button>
             ${u === 'ADMIN' ? '' : `
-              <button onclick="deleteProfile('${u}')" class="px-3 py-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 text-[10px] font-black uppercase">
-                Eliminar
-              </button>
+              <button onclick="openMergeModal(${JSON.stringify(u)})"
+                class="px-2 py-1.5 rounded-xl bg-blue-100 hover:bg-blue-200 text-blue-700 text-[10px] font-black uppercase">🔗</button>
+              <button onclick="deleteProfile(${JSON.stringify(u)})"
+                class="px-2 py-1.5 rounded-xl bg-red-100 hover:bg-red-200 text-red-700 text-[10px] font-black uppercase">✕</button>
             `}
           </div>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">
           <div class="md:col-span-2">
             <div class="text-[9px] font-black text-gray-400 uppercase mb-1">Renombrar perfil</div>
-            <input id="p-name-${cssSafe(u)}" value="${escapeHTML(u)}" class="w-full bg-white border-gray-200 focus:border-blue-400 rounded-xl text-gray-900" ${u === 'ADMIN' ? 'disabled' : ''}/>
+            <input id="p-name-${cssSafe(u)}" value="${escapeHTML(u)}"
+              class="w-full bg-white border-gray-200 focus:border-blue-400 rounded-xl text-gray-900"
+              ${u === 'ADMIN' ? 'disabled' : ''}/>
           </div>
           <div>
             <div class="text-[9px] font-black text-gray-400 uppercase mb-1">PIN</div>
-            <input id="p-pin-${cssSafe(u)}" value="${escapeHTML(user.pin || '0000')}" maxlength="4" class="w-full bg-white border-gray-200 focus:border-blue-400 rounded-xl text-gray-900"/>
+            <input id="p-pin-${cssSafe(u)}" value="${escapeHTML(user.pin || '0000')}" maxlength="4"
+              class="w-full bg-white border-gray-200 focus:border-blue-400 rounded-xl text-gray-900"/>
           </div>
           <div class="md:col-span-3">
             <div class="text-[9px] font-black text-gray-400 uppercase mb-1">Localidad</div>
             <select id="p-loc-${cssSafe(u)}" class="w-full bg-white border-gray-200 focus:border-blue-400 rounded-xl text-gray-900">
               ${db.localities
                 .filter(l => l.toUpperCase() !== 'GENERAL')
-                .map(l => `<option value="${escapeHTML(l)}" ${(user.locality || 'San Salvador') === l ? 'selected' : ''}>${escapeHTML(l)}</option>`)
+                .map(l => `<option value="${escapeHTML(l)}" ${(user.locality||'San Salvador')===l?'selected':''}>${escapeHTML(l)}</option>`)
                 .join('')}
             </select>
           </div>
           <div class="md:col-span-3">
-            <button onclick="saveProfileEdits('${u}')" class="w-full p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase text-[11px]">
-              💾 Guardar cambios de este perfil
+            <button onclick="saveProfileEdits(${JSON.stringify(u)})"
+              class="w-full p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black uppercase text-[11px]">
+              💾 Guardar cambios
             </button>
           </div>
         </div>
@@ -4845,79 +4549,169 @@ function saveProfileEdits(u){
   alert("Perfil actualizado.");
 }
 
-function detectDuplicateProfiles(){
+// =========================================================
+// Profile Merge Functions
+// =========================================================
+
+function detectSimilarProfiles(){
   const users = Object.keys(db.users);
-  const groups = {};
-  users.forEach(u => {
-    const norm = normalizeName(u);
-    if(!groups[norm]) groups[norm] = [];
-    groups[norm].push(u);
+  const pairs = [];
+  for(let i = 0; i < users.length; i++){
+    for(let j = i+1; j < users.length; j++){
+      const a = users[i], b = users[j];
+      const na = normalizeName(a), nb = normalizeName(b);
+      if(na === nb){
+        pairs.push({a, b, reason: 'Mismo nombre (diferente acentuación)'});
+      } else {
+        const aw = na.split(' ').filter(w => w.length > 2);
+        const bw = nb.split(' ').filter(w => w.length > 2);
+        if(aw.length === 0 || bw.length === 0) continue;
+        const common = aw.filter(w => bw.includes(w)).length;
+        const score = common / Math.max(aw.length, bw.length);
+        if(score >= 0.7){
+          pairs.push({a, b, reason: `${Math.round(score*100)}% de palabras coinciden`});
+        }
+      }
+    }
+  }
+  return pairs;
+}
+
+function _profileMonthSet(userKey){
+  const user = db.users[userKey];
+  const months = new Set();
+  Object.keys(user?.data || {}).forEach(k => {
+    const p = k.split('-');
+    if(p.length >= 2) months.add(`${p[0]}-${String(parseInt(p[1])).padStart(2,'0')}`);
   });
-  const duplicates = Object.values(groups).filter(g => g.length > 1);
+  return months;
+}
 
-  const section = document.getElementById('duplicateProfilesSection');
-  const list = document.getElementById('duplicateProfilesList');
-  section.classList.remove('hidden');
+function openMergeModal(sourceUser){
+  if(!isEditMode()) return alert("Activa modo edición.");
+  const modal = document.getElementById('mergeProfilesModal');
+  if(!modal) return;
 
-  if(duplicates.length === 0){
-    list.innerHTML = '<p class="text-[11px] text-amber-700 font-bold">No se encontraron perfiles duplicados.</p>';
+  const users = Object.keys(db.users).sort();
+  const sourceSel = document.getElementById('mergeSourceSel');
+  const targetSel = document.getElementById('mergeTargetSel');
+
+  sourceSel.innerHTML = users.map(u =>
+    `<option value="${escapeHTML(u)}" ${u === sourceUser ? 'selected':''}>${escapeHTML(u)}</option>`
+  ).join('');
+
+  // Default target: first user that is not the source
+  const defaultTarget = users.find(u => u !== sourceUser) || '';
+  targetSel.innerHTML = users.map(u =>
+    `<option value="${escapeHTML(u)}" ${u === defaultTarget ? 'selected':''}>${escapeHTML(u)}</option>`
+  ).join('');
+
+  renderMergePreview();
+  modal.classList.add('active');
+}
+
+function closeMergeModal(){
+  const modal = document.getElementById('mergeProfilesModal');
+  if(modal) modal.classList.remove('active');
+}
+
+function _updateMergeKeepNameSelect(){
+  const src = document.getElementById('mergeSourceSel')?.value;
+  const tgt = document.getElementById('mergeTargetSel')?.value;
+  const keepSel = document.getElementById('mergeKeepNameSel');
+  if(!keepSel) return;
+  const opts = [tgt, src].filter(Boolean).filter((v,i,a) => a.indexOf(v) === i);
+  keepSel.innerHTML = opts.map(u => `<option value="${escapeHTML(u)}">${escapeHTML(u)}</option>`).join('');
+}
+
+function renderMergePreview(){
+  const src = document.getElementById('mergeSourceSel')?.value;
+  const tgt = document.getElementById('mergeTargetSel')?.value;
+  const preview = document.getElementById('mergePreview');
+  _updateMergeKeepNameSelect();
+
+  if(!src || !tgt || src === tgt){
+    if(preview) preview.innerHTML = '<span class="text-amber-600 font-bold">Selecciona dos perfiles distintos.</span>';
+    return;
+  }
+  if(!db.users[src] || !db.users[tgt]){
+    if(preview) preview.innerHTML = '<span class="text-red-600 font-bold">Perfil no encontrado.</span>';
     return;
   }
 
-  list.innerHTML = duplicates.map(group => {
-    const options = group.map(n =>
-      `<option value="${escapeHTML(n)}">${escapeHTML(n)}</option>`
-    ).join('');
-    const groupId = 'dup_' + normalizeName(group[0]).replace(/\s+/g,'_');
-    return `
-      <div class="bg-white border border-amber-300 rounded-2xl p-3">
-        <p class="text-[11px] font-black text-amber-900 mb-2">
-          Mismo nombre: ${group.map(n => `<strong>${escapeHTML(n)}</strong>`).join(' / ')}
-        </p>
-        <div class="flex flex-wrap gap-2 items-center">
-          <div class="flex-1 min-w-0">
-            <label class="text-[9px] font-black text-gray-500 uppercase">Origen (se eliminará)</label>
-            <select id="${groupId}_src" class="w-full bg-white border-gray-200 rounded-xl text-[11px] font-bold">${options}</select>
-          </div>
-          <div class="flex-1 min-w-0">
-            <label class="text-[9px] font-black text-gray-500 uppercase">Destino (se conserva)</label>
-            <select id="${groupId}_tgt" class="w-full bg-white border-gray-200 rounded-xl text-[11px] font-bold">${options}</select>
-          </div>
-          <button onclick="mergeProfiles(document.getElementById('${groupId}_src').value, document.getElementById('${groupId}_tgt').value)"
-            class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-[10px] font-black uppercase whitespace-nowrap mt-4">
-            🔀 Fusionar
-          </button>
-        </div>
-      </div>`;
-  }).join('');
+  const srcMonths = _profileMonthSet(src);
+  const tgtMonths = _profileMonthSet(tgt);
+  const allMonths = [...new Set([...srcMonths, ...tgtMonths])].sort();
+  const conflicts = allMonths.filter(m => srcMonths.has(m) && tgtMonths.has(m));
+  const srcOnly   = allMonths.filter(m => srcMonths.has(m) && !tgtMonths.has(m));
+  const tgtOnly   = allMonths.filter(m => !srcMonths.has(m) && tgtMonths.has(m));
+  const MN = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const fmt = ym => { const [y,m] = ym.split('-'); return `${MN[parseInt(m)-1]} ${y}`; };
+
+  let html = '<div class="space-y-2">';
+  html += `<div class="font-black text-gray-800">Resumen de fusión:</div>`;
+  html += '<div class="text-[10px] space-y-1 leading-relaxed">';
+  if(srcOnly.length)   html += `<div>📥 Solo en <b>${escapeHTML(src)}</b>: ${srcOnly.map(fmt).join(', ')}</div>`;
+  if(tgtOnly.length)   html += `<div>📁 Solo en <b>${escapeHTML(tgt)}</b>: ${tgtOnly.map(fmt).join(', ')}</div>`;
+  if(conflicts.length) html += `<div class="text-amber-700">⚠️ Conflicto (ambos tienen datos): ${conflicts.map(fmt).join(', ')}</div>`;
+  if(!allMonths.length) html += `<div class="text-gray-400">Ninguno de los dos tiene datos de calendario todavía.</div>`;
+  html += '</div>';
+  html += `<div class="text-[10px] text-red-600 font-bold pt-1">El perfil "<b>${escapeHTML(src)}</b>" será eliminado tras fusionar.</div>`;
+  html += '</div>';
+  if(preview) preview.innerHTML = html;
 }
 
-function mergeProfiles(source, target){
-  if(!source || !target) return alert("Selecciona origen y destino.");
-  if(source === target) return alert("El origen y destino no pueden ser el mismo perfil.");
-  if(!db.users[source] || !db.users[target]) return alert("Uno de los perfiles no existe.");
-  if(!confirm(`¿Fusionar "${source}" → "${target}"?\n\nLos días de "${source}" se copiarán a "${target}" donde no haya turno asignado.\nLuego "${source}" será eliminado.`)) return;
+function executeMerge(){
+  if(!isEditMode()) return alert("Activa modo edición.");
+  const src  = document.getElementById('mergeSourceSel')?.value;
+  const tgt  = document.getElementById('mergeTargetSel')?.value;
+  const keepName = document.getElementById('mergeKeepNameSel')?.value?.trim()?.toUpperCase();
+  const conflictStrategy = document.querySelector('input[name="mergeConflict"]:checked')?.value || 'target';
 
-  const srcData = db.users[source].data || {};
-  const tgtData = db.users[target].data || {};
+  if(!src || !tgt) return alert("Selecciona los perfiles.");
+  if(src === tgt)  return alert("Selecciona dos perfiles distintos.");
+  if(!db.users[src] || !db.users[tgt]) return alert("Perfil no encontrado.");
+  if(!confirm(`¿Fusionar "${src}" → "${tgt}"?\n\nEl perfil "${src}" será eliminado. Esta acción no se puede deshacer.`)) return;
 
-  Object.keys(srcData).forEach(key => {
-    if(isEffectivelyEmptyDayData(tgtData[key])){
-      tgtData[key] = JSON.parse(JSON.stringify(srcData[key]));
+  const srcUser = db.users[src];
+  const tgtUser = db.users[tgt];
+
+  // Fusionar datos de calendario
+  Object.entries(srcUser.data || {}).forEach(([dateKey, dayData]) => {
+    if(conflictStrategy === 'source' || !tgtUser.data[dateKey]){
+      tgtUser.data[dateKey] = JSON.parse(JSON.stringify(dayData));
     }
   });
-  db.users[target].data = tgtData;
 
-  if(db.current === source) db.current = target;
-  delete db.users[source];
+  // Fusionar turnos configurados: añadir al destino los que no existan
+  Object.entries(srcUser.config || {}).forEach(([shiftKey, shiftDef]) => {
+    if(!tgtUser.config[shiftKey]){
+      tgtUser.config[shiftKey] = JSON.parse(JSON.stringify(shiftDef));
+    }
+  });
+
+  let finalName = tgt;
+
+  // Si el nombre elegido es el del origen, renombrar el destino
+  if(keepName && keepName !== tgt && keepName === src){
+    db.users[src] = tgtUser;       // copiar datos del destino al nombre del origen
+    delete db.users[tgt];
+    if(db.current === tgt) db.current = src;
+    finalName = src;
+  } else {
+    // Eliminar origen
+    delete db.users[src];
+    if(db.current === src) db.current = tgt;
+    finalName = tgt;
+  }
 
   saveDB();
+  closeMergeModal();
   updateUserDropdown();
   updateUserInitial();
   render();
   renderProfilesList();
-  detectDuplicateProfiles();
-  alert(`Fusión completada. "${source}" fue combinado en "${target}".`);
+  alert(`✅ Fusión completada. Perfil final: "${finalName}".`);
 }
 
 // =========================================================
@@ -4953,615 +4747,7 @@ function closeImportModalAndRefresh(){
   calcSummary();
 }
 
-// =========================================================
-// Image Import (OCR con Tesseract.js)
-// =========================================================
-let ocrDetectedShifts = [];
-let ocrCalendarAnalysis = null;
-
-function openImageImportModal(){
-  const modal = document.getElementById('imageImportModal');
-  if(!modal) return;
-
-  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const mSel = document.getElementById('imgImportMonth');
-  const ySel = document.getElementById('imgImportYear');
-  if(mSel) mSel.innerHTML = months.map((m,i) => `<option value="${i}" ${i===current.getMonth()?'selected':''}>${m}</option>`).join('');
-  if(ySel) ySel.innerHTML = [-2,-1,0,1,2].map(d => {
-    const y = current.getFullYear()+d;
-    return `<option value="${y}" ${d===0?'selected':''}>${y}</option>`;
-  }).join('');
-
-  fillImageImportShiftOptions();
-  syncImageImportProfileHint();
-
-  const fileEl = document.getElementById('imageImportFile');
-  if(fileEl) fileEl.value = '';
-  document.getElementById('imgPreviewBox')?.classList.add('hidden');
-  document.getElementById('ocrStatus')?.classList.add('hidden');
-  document.getElementById('ocrResultsBox')?.classList.add('hidden');
-  document.getElementById('ocrRawText').textContent = '';
-  document.getElementById('ocrResultsList').innerHTML = '';
-  document.getElementById('ocrAnalysisSummary').innerHTML = '';
-  document.getElementById('ocrAnalysisSummary')?.classList.add('hidden');
-  ocrDetectedShifts = [];
-  ocrCalendarAnalysis = null;
-
-  modal.classList.add('active');
-}
-
-function closeImageImportModal(){
-  const modal = document.getElementById('imageImportModal');
-  if(modal) modal.classList.remove('active');
-}
-
-function syncImageImportProfileHint(){
-  const el = document.getElementById('imgImportProfileName');
-  if(el) el.textContent = db.current || '—';
-}
-
-function fillImageImportShiftOptions(){
-  const sel = document.getElementById('imgImportShift');
-  const user = db.users?.[db.current];
-  if(!sel || !user) return;
-  ensureCanonicalCoreShiftsForUser(user);
-  const visible = Object.keys(user.config || {}).filter(k => {
-    const cfg = user.config[k] || {};
-    return cfg.enabled || ['Mañana','Tarde','16hrs','CENA','L','Vacaciones'].includes(k);
-  }).sort((a,b) => a.localeCompare(b,'es'));
-  sel.innerHTML = visible.map(k => `<option value="${k}">${k}</option>`).join('');
-  if(visible.includes('CENA')) sel.value = 'CENA';
-  else if(visible.includes('Mañana')) sel.value = 'Mañana';
-  else if(visible.length) sel.value = visible[0];
-}
-
-function previewImportImage(input){
-  const preview = document.getElementById('imgPreview');
-  const box = document.getElementById('imgPreviewBox');
-  if(input.files && input.files[0]){
-    preview.src = URL.createObjectURL(input.files[0]);
-    box.classList.remove('hidden');
-  }
-}
-
-async function loadImageElementFromFile(file){
-  return await new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-    img.onerror = (err) => { URL.revokeObjectURL(url); reject(err || new Error('No se pudo cargar la imagen.')); };
-    img.src = url;
-  });
-}
-
-async function buildPreprocessedOCRCanvas(file){
-  const img = await loadImageElementFromFile(file);
-  const maxWidth = 2200;
-  const scale = Math.max(1.8, Math.min(2.8, maxWidth / Math.max(img.width, 1)));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(img.width * scale));
-  canvas.height = Math.max(1, Math.round(img.height * scale));
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const data = imageData.data;
-  for(let i=0; i<data.length; i+=4){
-    const r = data[i], g = data[i+1], b = data[i+2];
-    let gray = 0.299*r + 0.587*g + 0.114*b;
-    gray = ((gray - 128) * 2.25) + 128;
-    gray = Math.max(0, Math.min(255, gray));
-    if(gray > 185) gray = 255;
-    else if(gray < 95) gray = 0;
-    data[i] = data[i+1] = data[i+2] = gray;
-  }
-  ctx.putImageData(imageData, 0, 0);
-  return { canvas, width: canvas.width, height: canvas.height };
-}
-
-async function runImageOCR(){
-  const fileInput = document.getElementById('imageImportFile');
-  if(!fileInput.files || !fileInput.files[0]) return alert('Selecciona una imagen primero.');
-  if(typeof Tesseract === 'undefined') return alert('La librería OCR aún está cargando. Espera un momento y vuelve a intentarlo.');
-
-  const status = document.getElementById('ocrStatus');
-  const resultsBox = document.getElementById('ocrResultsBox');
-  status.classList.remove('hidden');
-  status.textContent = 'Preparando imagen...';
-  resultsBox.classList.add('hidden');
-  document.getElementById('ocrAnalysisSummary')?.classList.add('hidden');
-  ocrDetectedShifts = [];
-  ocrCalendarAnalysis = null;
-
-  try {
-    const prep = await buildPreprocessedOCRCanvas(fileInput.files[0]);
-    status.textContent = 'Iniciando OCR...';
-
-    const result = await Tesseract.recognize(
-      prep.canvas,
-      'spa+eng',
-      { logger: m => {
-        if(m.status === 'recognizing text'){
-          status.textContent = `Leyendo imagen: ${Math.round(m.progress * 100)}%`;
-        }
-      }}
-    );
-
-    const rawText = String(result?.data?.text || '');
-    document.getElementById('ocrRawText').textContent = rawText;
-
-    const month0 = parseInt(document.getElementById('imgImportMonth').value, 10);
-    const year = parseInt(document.getElementById('imgImportYear').value, 10);
-    const forcedShift = document.getElementById('imgImportShift')?.value || 'CENA';
-
-    status.textContent = 'OCR completado. Analizando calendario...';
-
-    const analysis = analyzeCalendarImageOCR(result, { month0, year, forcedShift, profileName: db.current, imageHeight: prep.height });
-    ocrCalendarAnalysis = analysis;
-
-    if(analysis && analysis.detectedShift){
-      const shiftSel = document.getElementById('imgImportShift');
-      if(shiftSel && Array.from(shiftSel.options).some(op => op.value === analysis.detectedShift)){
-        shiftSel.value = analysis.detectedShift;
-        analysis.detections.forEach(d => d.shift = shiftSel.value);
-      }
-    }
-
-    ocrDetectedShifts = (analysis?.detections || []).map(d => ({ ...d, shift: document.getElementById('imgImportShift')?.value || d.shift || forcedShift }));
-
-    if(ocrDetectedShifts.length === 0){
-      ocrDetectedShifts = parseOCRShiftsRawText(rawText, year, month0);
-      if(ocrDetectedShifts.length > 0){
-        status.textContent = `Se detectaron ${ocrDetectedShifts.length} día(s) por texto OCR. Revisa antes de aplicar.`;
-      } else {
-        status.textContent = 'No se detectaron coincidencias para el perfil actual. Revisa la vista previa o el texto OCR crudo.';
-      }
-    } else {
-      status.textContent = `Se detectaron ${ocrDetectedShifts.length} día(s) del perfil actual. Revisa y aplica.`;
-    }
-
-    renderOCRDetectedShifts();
-  } catch(e){
-    status.textContent = 'Error OCR: ' + (e?.message || e);
-  }
-}
-
-function getMonthSlots(year, month0){
-  const first = new Date(year, month0, 1).getDay();
-  const lastDay = new Date(year, month0 + 1, 0).getDate();
-  const slots = {};
-  for(let day=1; day<=lastDay; day++){
-    const idx = first + (day - 1);
-    slots[day] = { day, row: Math.floor(idx / 7), col: idx % 7 };
-  }
-  return { first, lastDay, slots };
-}
-
-function safeNumber(v, fallback=0){
-  const n = Number(v);
-  return Number.isFinite(n) ? n : fallback;
-}
-
-function extractOCRWordItems(result){
-  const rawWords = Array.isArray(result?.data?.words) ? result.data.words : [];
-  return rawWords.map(w => {
-    const text = String(w?.text || '').trim();
-    const b = w?.bbox || {};
-    const x0 = safeNumber(b.x0, safeNumber(w.left, 0));
-    const y0 = safeNumber(b.y0, safeNumber(w.top, 0));
-    const x1 = safeNumber(b.x1, x0 + safeNumber(w.width, 0));
-    const y1 = safeNumber(b.y1, y0 + safeNumber(w.height, 0));
-    return {
-      text,
-      conf: safeNumber(w?.confidence, safeNumber(w?.conf, 0)),
-      x0, y0, x1, y1,
-      w: Math.max(0, x1 - x0),
-      h: Math.max(0, y1 - y0),
-      cx: x0 + (x1 - x0) / 2,
-      cy: y0 + (y1 - y0) / 2
-    };
-  }).filter(w => w.text);
-}
-
-function normalizeImportText(value){
-  return String(value || '')
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-zA-Z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase();
-}
-
-function significantNameTokens(value){
-  const stop = new Set(['lic','licda','licenciado','licenciada','ing','ingeniero','ingeniera','dra','dr','doctor','doctora','sr','sra','senor','senora','de','del','la','el','los','las','y','asueto','vacaciones','libre','domingo','lunes','martes','miercoles','jueves','viernes','sabado','dom','lun','mar','mie','mier','jue','vie','sab']);
-  return normalizeImportText(value).split(' ').filter(t => t.length > 2 && !stop.has(t));
-}
-
-function levenshteinDistance(a, b){
-  a = String(a || '');
-  b = String(b || '');
-  const m = a.length, n = b.length;
-  if(!m) return n;
-  if(!n) return m;
-  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
-  for(let i=0;i<=m;i++) dp[i][0] = i;
-  for(let j=0;j<=n;j++) dp[0][j] = j;
-  for(let i=1;i<=m;i++){
-    for(let j=1;j<=n;j++){
-      const cost = a[i-1] === b[j-1] ? 0 : 1;
-      dp[i][j] = Math.min(dp[i-1][j] + 1, dp[i][j-1] + 1, dp[i-1][j-1] + cost);
-    }
-  }
-  return dp[m][n];
-}
-
-function tokenSimilarity(a, b){
-  a = normalizeImportText(a);
-  b = normalizeImportText(b);
-  if(!a || !b) return 0;
-  if(a === b) return 1;
-  if(a.includes(b) || b.includes(a)) return Math.min(a.length, b.length) / Math.max(a.length, b.length);
-  const dist = levenshteinDistance(a, b);
-  return Math.max(0, 1 - (dist / Math.max(a.length, b.length, 1)));
-}
-
-function scoreCellAgainstProfile(cellText, profileName){
-  const sourceTokens = significantNameTokens(cellText);
-  const targetTokens = significantNameTokens(profileName);
-  if(!sourceTokens.length || !targetTokens.length) return { matched:false, score:0, sourceTokens, targetTokens, matchedTokens:[] };
-
-  const surnameTokens = targetTokens.slice(-Math.min(2, targetTokens.length));
-  const surnameScores = surnameTokens.map(t => Math.max(...sourceTokens.map(s => tokenSimilarity(t, s)), 0));
-  const allScores = targetTokens.map(t => Math.max(...sourceTokens.map(s => tokenSimilarity(t, s)), 0));
-  const bestSurname = Math.max(...surnameScores, 0);
-  const avgSurname = surnameScores.length ? surnameScores.reduce((a,b) => a+b, 0) / surnameScores.length : 0;
-  const avgAll = allScores.length ? allScores.reduce((a,b) => a+b, 0) / allScores.length : 0;
-  const score = (bestSurname * 0.72) + (avgSurname * 0.18) + (avgAll * 0.10);
-
-  const matchedTokens = [];
-  surnameTokens.forEach(t => {
-    sourceTokens.forEach(s => {
-      const sim = tokenSimilarity(t, s);
-      if(sim >= 0.84) matchedTokens.push({ target:t, source:s, sim });
-    });
-  });
-
-  const matched = (bestSurname >= 0.84 && score >= 0.62) || (avgSurname >= 0.80 && score >= 0.58);
-  return { matched, score, bestSurname, avgSurname, avgAll, sourceTokens, targetTokens, matchedTokens };
-}
-
-function extractShiftSuggestionFromWords(words, user, fallbackText=''){
-  const shiftKeys = Object.keys(user?.config || {});
-  const topLimit = words.length ? Math.max(...words.map(x => x.cy)) * 0.18 : 160;
-  const normalizedTop = words.filter(w => w.cy <= topLimit).map(w => normalizeImportText(w.text)).join(' ');
-  const normalizedRaw = normalizeImportText(fallbackText).split(' ').slice(0, 20).join(' ');
-  const haystack = `${normalizedTop} ${normalizedRaw}`;
-  const aliases = {
-    'cena': 'CENA',
-    'manana': 'Mañana',
-    'tarde': 'Tarde',
-    '16hrs': '16hrs',
-    '16hr': '16hrs',
-    '16h': '16hrs',
-    'libre': 'L',
-    'vacaciones': 'Vacaciones'
-  };
-  for(const [alias, shift] of Object.entries(aliases)){
-    if(haystack.includes(alias) && shiftKeys.includes(shift)) return shift;
-  }
-  return null;
-}
-
-function pickBestNumericDayWords(words, lastDay, imageHeight){
-  const grouped = new Map();
-  words.forEach(w => {
-    const clean = String(w.text || '').replace(/\D/g, '');
-    if(!/^\d{1,2}$/.test(clean)) return;
-    const day = parseInt(clean, 10);
-    if(!(day >= 1 && day <= lastDay)) return;
-    const area = Math.max(1, w.w * w.h);
-    const penaltyBottom = w.cy > imageHeight * 0.88 ? 18 : 0;
-    const penaltyTop = w.cy < imageHeight * 0.10 ? 10 : 0;
-    const score = safeNumber(w.conf, 0) + Math.min(area / 120, 14) - penaltyBottom - penaltyTop;
-    const arr = grouped.get(day) || [];
-    arr.push({ ...w, day, score, area, clean });
-    grouped.set(day, arr);
-  });
-
-  const selected = [];
-  grouped.forEach(arr => {
-    arr.sort((a,b) => b.score - a.score || b.conf - a.conf || b.area - a.area);
-    selected.push(arr[0]);
-  });
-  return selected;
-}
-
-function linearRegression(points, keyX, keyY){
-  if(!points.length) return null;
-  const xs = points.map(p => safeNumber(p[keyX], 0));
-  const ys = points.map(p => safeNumber(p[keyY], 0));
-  const n = xs.length;
-  const meanX = xs.reduce((a,b)=>a+b,0)/n;
-  const meanY = ys.reduce((a,b)=>a+b,0)/n;
-  let num = 0, den = 0;
-  for(let i=0;i<n;i++){
-    num += (xs[i]-meanX)*(ys[i]-meanY);
-    den += (xs[i]-meanX)*(xs[i]-meanX);
-  }
-  const slope = den ? num/den : 0;
-  const intercept = meanY - slope*meanX;
-  return { slope, intercept };
-}
-
-function estimateCalendarGrid(dayWords, slots){
-  const points = dayWords.map(w => {
-    const slot = slots[w.day];
-    return slot ? { ...w, row: slot.row, col: slot.col, xRight: w.x1, yTop: w.y0 } : null;
-  }).filter(Boolean);
-  if(points.length < 6) return null;
-
-  const xFit = linearRegression(points, 'col', 'xRight');
-  const yFit = linearRegression(points, 'row', 'yTop');
-  if(!xFit || !yFit) return null;
-
-  const widths = points.map(p => p.w).filter(Boolean).sort((a,b)=>a-b);
-  const heights = points.map(p => p.h).filter(Boolean).sort((a,b)=>a-b);
-  const mid = arr => arr.length ? arr[Math.floor(arr.length/2)] : 24;
-
-  return {
-    cellW: xFit.slope,
-    baseX: xFit.intercept,
-    cellH: yFit.slope,
-    baseY: yFit.intercept,
-    numberW: mid(widths),
-    numberH: mid(heights),
-    samples: points.length
-  };
-}
-
-function getCalendarCellRect(grid, row, col){
-  const cellRight = grid.baseX + (grid.cellW * col) + 4;
-  const cellLeft = cellRight - grid.cellW + 2;
-  const cellTop = grid.baseY + (grid.cellH * row) - Math.max(10, grid.numberH * 0.45);
-  const cellBottom = cellTop + grid.cellH;
-  return { left: cellLeft, top: cellTop, right: cellRight, bottom: cellBottom };
-}
-
-function wordsInsideRect(words, rect, minYRatio=0, maxYRatio=1){
-  const height = rect.bottom - rect.top;
-  const minY = rect.top + (height * minYRatio);
-  const maxY = rect.top + (height * maxYRatio);
-  return words.filter(w => w.cx >= rect.left && w.cx <= rect.right && w.cy >= minY && w.cy <= maxY);
-}
-
-function buildTextFromCellWords(cellWords){
-  const excluded = new Set(['dom','lun','mar','mie','mier','jue','vie','sab','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre','asueto','cena']);
-  const filtered = cellWords
-    .filter(w => !/^\d{1,2}$/.test(String(w.text || '').trim()))
-    .filter(w => normalizeImportText(w.text) && !excluded.has(normalizeImportText(w.text)))
-    .sort((a,b) => a.cy - b.cy || a.cx - b.cx);
-  if(!filtered.length) return '';
-
-  const avgH = filtered.reduce((s,w)=>s + Math.max(10, w.h), 0) / filtered.length;
-  const threshold = Math.max(16, avgH * 0.9);
-  const lines = [];
-  filtered.forEach(w => {
-    let line = lines.find(line => Math.abs(line.cy - w.cy) <= threshold);
-    if(!line){
-      line = { cy: w.cy, items: [] };
-      lines.push(line);
-    }
-    line.items.push(w);
-    line.cy = (line.cy + w.cy) / 2;
-  });
-  lines.sort((a,b) => a.cy - b.cy);
-  return lines.map(line => line.items.sort((a,b)=>a.cx-b.cx).map(w => String(w.text || '').trim()).join(' ')).join(' ').replace(/\s+/g, ' ').trim();
-}
-
-function analyzeCalendarImageOCR(result, opts={}){
-  const { year, month0, forcedShift, profileName, imageHeight = 1600 } = opts;
-  const words = extractOCRWordItems(result).filter(w => w.conf >= 18);
-  const user = db.users?.[db.current];
-  const rawText = String(result?.data?.text || '');
-  const detectedShift = extractShiftSuggestionFromWords(words, user, rawText);
-  const { lastDay, slots } = getMonthSlots(year, month0);
-  const numericDays = pickBestNumericDayWords(words, lastDay, imageHeight);
-  const grid = estimateCalendarGrid(numericDays, slots);
-  const detections = [];
-
-  if(grid){
-    for(let day=1; day<=lastDay; day++){
-      const slot = slots[day];
-      if(!slot) continue;
-      const rect = getCalendarCellRect(grid, slot.row, slot.col);
-      const cellWords = wordsInsideRect(words, rect, 0.16, 0.88);
-      const cellText = buildTextFromCellWords(cellWords);
-      if(!cellText) continue;
-      const match = scoreCellAgainstProfile(cellText, profileName || db.current);
-      if(match.matched){
-        detections.push({
-          day,
-          shift: forcedShift || detectedShift || 'CENA',
-          selected: true,
-          cellText,
-          score: match.score,
-          method: match.matchedTokens.length ? 'apellido' : 'similitud',
-          matchedTokens: match.matchedTokens,
-          sourceTokens: match.sourceTokens,
-          targetTokens: match.targetTokens
-        });
-      }
-    }
-  }
-
-  const dedup = [];
-  const seen = new Set();
-  detections.sort((a,b) => a.day - b.day).forEach(d => {
-    if(seen.has(d.day)) return;
-    seen.add(d.day);
-    dedup.push(d);
-  });
-
-  return {
-    detectedShift,
-    detections: dedup,
-    grid,
-    numericSamples: numericDays.length,
-    totalWords: words.length
-  };
-}
-
-function parseOCRShiftsRawText(text, year, month0){
-  const user = db.users[db.current];
-  if(!user) return [];
-  const shiftKeys = Object.keys(user.config).map(k => k.toUpperCase());
-  const forcedShift = document.getElementById('imgImportShift')?.value || 'CENA';
-  const lastDay = new Date(year, month0 + 1, 0).getDate();
-  const detected = [];
-  const lines = String(text || '').split(/[\n\r]+/);
-  lines.forEach(line => {
-    const clean = line.trim();
-    const m = clean.match(/^(\d{1,2})[\s\-:.]+([A-Za-záéíóúÁÉÍÓÚüÜñÑ0-9]+)/);
-    if(m){
-      const day = parseInt(m[1], 10);
-      const code = m[2].toUpperCase().trim();
-      if(day >= 1 && day <= lastDay){
-        const shift = shiftKeys.includes(code) ? code : forcedShift;
-        detected.push({ day, shift, selected:true, cellText:clean, score:0.55, method:'texto OCR' });
-      }
-    }
-  });
-  const seen = new Set();
-  return detected.filter(e => {
-    if(seen.has(e.day)) return false;
-    seen.add(e.day);
-    return true;
-  }).sort((a,b) => a.day - b.day);
-}
-
-function renderOCRDetectedShifts(){
-  const box = document.getElementById('ocrResultsBox');
-  const list = document.getElementById('ocrResultsList');
-  const count = document.getElementById('ocrDetectedCount');
-  const summary = document.getElementById('ocrAnalysisSummary');
-  const user = db.users[db.current];
-  const month0 = parseInt(document.getElementById('imgImportMonth').value, 10);
-  const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  box.classList.remove('hidden');
-
-  const selectedCount = ocrDetectedShifts.filter(x => x.selected !== false).length;
-  count.textContent = `${ocrDetectedShifts.length} día(s) detectado(s) · ${selectedCount} seleccionado(s)`;
-
-  if(summary){
-    if(ocrCalendarAnalysis){
-      const parts = [];
-      if(ocrCalendarAnalysis.detectedShift) parts.push(`turno sugerido por título: ${ocrCalendarAnalysis.detectedShift}`);
-      if(ocrCalendarAnalysis.numericSamples) parts.push(`días guía leídos: ${ocrCalendarAnalysis.numericSamples}`);
-      if(ocrCalendarAnalysis.grid) parts.push('calendario estructurado detectado');
-      summary.textContent = parts.join(' · ');
-      summary.classList.toggle('hidden', parts.length === 0);
-    } else {
-      summary.textContent = '';
-      summary.classList.add('hidden');
-    }
-  }
-
-  if(!ocrDetectedShifts.length){
-    list.innerHTML = '<p class="text-[11px] text-gray-400">No se encontraron días del perfil actual. Puedes revisar el OCR crudo o intentar con una captura más nítida.</p>';
-    return;
-  }
-
-  list.innerHTML = ocrDetectedShifts.map((e, i) => {
-    const shiftCfg = (user?.config?.[e.shift]) || {};
-    const bg = shiftCfg.color ? `background:${getColorValue(shiftCfg.color)};` : '';
-    const checked = e.selected !== false ? 'checked' : '';
-    const scorePct = e.score ? `${Math.round(e.score * 100)}%` : '—';
-    const label = e.cellText ? escapeHtml(e.cellText) : 'Sin texto detallado';
-    const method = e.method || 'OCR';
-    const notePreview = escapeHtml((shiftCfg.note || '').toString().trim() || (((shiftCfg.in || '00:00') !== '00:00' || (shiftCfg.out || '00:00') !== '00:00') ? `${shiftCfg.in || '00:00'} a ${shiftCfg.out || '00:00'}` : ''));
-    return `
-      <label class="flex gap-3 items-start rounded-2xl border border-gray-200 bg-white p-3">
-        <input type="checkbox" ${checked} onchange="toggleOCRSelection(${i}, this.checked)" class="mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600">
-        <div class="min-w-0 flex-1">
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="text-[11px] font-black text-gray-800">${monthNames[month0]} ${e.day}</span>
-            <span class="px-2 py-0.5 rounded-lg text-[10px] font-black" style="${bg}color:#111">${escapeHtml(e.shift || '')}</span>
-            <span class="px-2 py-0.5 rounded-lg bg-indigo-50 text-indigo-700 text-[10px] font-black">${escapeHtml(method)}</span>
-            <span class="ml-auto text-[10px] font-black text-gray-400">${scorePct}</span>
-          </div>
-          <div class="mt-1 text-[11px] font-bold text-gray-700 break-words">${label}</div>
-          ${notePreview ? `<div class="mt-1 text-[10px] font-black text-violet-700">Se aplicará: ${notePreview}</div>` : ''}
-        </div>
-      </label>`;
-  }).join('');
-}
-
-function toggleOCRSelection(index, checked){
-  if(!ocrDetectedShifts[index]) return;
-  ocrDetectedShifts[index].selected = !!checked;
-  renderOCRDetectedShifts();
-}
-
-function setAllOCRSelections(flag){
-  ocrDetectedShifts.forEach(item => { item.selected = !!flag; });
-  renderOCRDetectedShifts();
-}
-
-function isPracticallyEmptyForOCRImport(info){
-  return isEffectivelyEmptyDayData(info);
-}
-
-function applyOCRResults(){
-  const selected = ocrDetectedShifts.filter(x => x.selected !== false);
-  if(selected.length === 0) return alert('No hay días seleccionados para aplicar.');
-
-  const year  = parseInt(document.getElementById('imgImportYear').value, 10);
-  const month = parseInt(document.getElementById('imgImportMonth').value, 10) + 1;
-  const shift = document.getElementById('imgImportShift')?.value || 'CENA';
-  const mode = document.getElementById('imgImportMode')?.value || 'replace';
-  const user = db.users[db.current];
-  if(!user) return;
-
-  ensureCanonicalCoreShiftsForUser(user);
-
-  let applied = 0;
-  let skipped = 0;
-  selected.forEach(e => {
-    const key = dayKey(year, month, e.day);
-    const prev = user.data[key] || {};
-    if(mode === 'merge' && !isPracticallyEmptyForOCRImport(prev)){
-      skipped++;
-      return;
-    }
-
-    const nextDay = buildSimpleDayFromShiftKeyForUser(user, shift, prev);
-    if(prev && prev.photoData) nextDay.photoData = prev.photoData;
-    nextDay.imageImportMeta = {
-      source: 'ocr-image',
-      appliedAt: new Date().toISOString(),
-      profile: db.current,
-      matchedText: e.cellText || '',
-      score: Number(e.score || 0),
-      method: e.method || 'OCR'
-    };
-
-    user.data[key] = nextDay;
-    applied++;
-  });
-
-  saveDB();
-  render();
-  renderSummaryCategories();
-  calcSummary();
-  closeImageImportModal();
-  alert(`Se aplicaron ${applied} día(s) con turno ${shift} al perfil ${db.current}.${skipped ? ` Se omitieron ${skipped} por tener datos previos.` : ''}`);
-}
-
 function selectAllImportUsers(flag){
-
   document.querySelectorAll('.impUserChk').forEach(ch => {
     ch.checked = flag;
   });
@@ -6063,13 +5249,34 @@ async function analyzeImportFile(){
     if(importContext.users.length === 0){
       list.innerHTML = `<div class="text-gray-400 font-bold">No se detectaron usuarios.</div>`;
     } else {
-      list.innerHTML = importContext.users.map(u => {
+      list.innerHTML = importContext.users.map((u, idx) => {
         const matchedProfile = nameMatchMap[u];
-        const matchLabel = matchedProfile ? ` <span style="color:#1e40af;font-size:10px;">→ usa perfil: ${escapeHTML(matchedProfile)}</span>` : '';
+        if(matchedProfile){
+          const radioName = `impUnify_${idx}`;
+          return `
+          <div class="p-2 rounded-xl bg-blue-50 border border-blue-200 mb-1">
+            <div class="flex items-start gap-2">
+              <input class="impUserChk mt-1 flex-shrink-0" type="checkbox" value="${escapeHTML(u)}" checked>
+              <div class="min-w-0">
+                <div class="font-black text-[11px] text-gray-900">${escapeHTML(u)}</div>
+                <div class="text-[10px] text-blue-700 font-bold mt-0.5">⚠️ Similar a perfil existente: <strong>${escapeHTML(matchedProfile)}</strong></div>
+                <div class="flex gap-4 mt-1">
+                  <label class="flex items-center gap-1 text-[10px] font-bold cursor-pointer text-blue-800">
+                    <input type="radio" name="${radioName}" value="unify" checked
+                      data-import-name="${escapeHTML(u)}" data-existing="${escapeHTML(matchedProfile)}"> Unificar con perfil existente
+                  </label>
+                  <label class="flex items-center gap-1 text-[10px] font-bold cursor-pointer text-gray-700">
+                    <input type="radio" name="${radioName}" value="new"> Crear perfil nuevo
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        }
         return `
         <label class="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-50 cursor-pointer" style="color: #111827;">
           <input class="impUserChk" type="checkbox" value="${escapeHTML(u)}" checked>
-          <span class="font-black">${escapeHTML(u)}${matchLabel}</span>
+          <span class="font-black">${escapeHTML(u)}</span>
         </label>`;
       }).join('');
     }
@@ -6100,9 +5307,14 @@ function runImportSelected(){
   
   const { rows, headerIdx, nameCol, empCol, dayCols, monthIndex0, year } = importContext;
 
-  // Resolver nombres fuzzy: si hay match con perfil existente, usar el perfil existente
+  // Resolver nombres: respetar la decisión del usuario (unificar vs crear nuevo)
   const nameMatchMap = (importContext && importContext.nameMatchMap) || {};
-  const resolvedNames = selected.map(u => nameMatchMap[u] || u);
+  const resolvedNames = selected.map(u => {
+    if(!nameMatchMap[u]) return u;
+    // Buscar el radio "unify" marcado para este usuario
+    const unifyRadio = document.querySelector(`input[type="radio"][data-import-name="${CSS.escape(u)}"][value="unify"]`);
+    return (unifyRadio && unifyRadio.checked) ? nameMatchMap[u] : u;
+  });
 
   // Asegurar que los usuarios existen
   resolvedNames.forEach(u => ensureUserExists(u));
@@ -6130,8 +5342,9 @@ function runImportSelected(){
     const name = safeNameCell(row[nameCol]).toUpperCase();
     if(!selected.includes(name)) continue;
 
-    // Resolver a perfil existente si hay coincidencia fuzzy
-    const resolvedName = nameMatchMap[name] || name;
+    // Resolver nombre según decisión del usuario (unificar o crear nuevo)
+    const unifyRadioRow = document.querySelector(`input[type="radio"][data-import-name="${CSS.escape(name)}"][value="unify"]`);
+    const resolvedName = (nameMatchMap[name] && unifyRadioRow && unifyRadioRow.checked) ? nameMatchMap[name] : name;
     const userKey = ensureUserExists(resolvedName);
     const user = db.users[userKey];
     if (!user) continue;
@@ -6156,8 +5369,8 @@ function runImportSelected(){
       
       const key = dayKey(year, monthIndex0 + 1, day);
 
-      // Saltar si es modo merge y el día ya tiene información real
-      if(importMode === 'merge' && !isEffectivelyEmptyDayData(user.data[key])) continue;
+      // Saltar si es modo merge y ya existe
+      if(importMode === 'merge' && user.data[key]) continue;
 
       // Proteger meses pasados: en modo replace, no tocar meses anteriores al actual
       {
@@ -6477,8 +5690,8 @@ function buildExportHTML(userKey, locality, year, monthIndex0, todayStr, catHour
     const dPrev = prevLastDay - i;
     const keyPrev = dayKey(prevYear, prevMonth0+1, dPrev);
     const infoPrev = (user.data && user.data[keyPrev]) ? user.data[keyPrev] : null;
-    const bgPrev = infoPrev ? getDayPrimaryShiftColor(infoPrev, SHIFTS) : '#ffffff';
-    const labelPrev = infoPrev ? getDayPrimaryShiftLabel(infoPrev, SHIFTS) : '';
+    const bgPrev = infoPrev ? getColorValue(infoPrev) : '#ffffff';
+    const labelPrev = infoPrev ? (infoPrev.mode==='simple' ? (infoPrev.s||'') : (infoPrev.sTop||'')) : '';
     const dayHTMLPrev = `
       <div style="height:100px;position:relative;border:1px solid #e5e7eb;background:${bgPrev};opacity:0.35;">
         <div style="position:absolute;top:6px;right:8px;font-size:14px;color:#111827;font-weight:700;">${dPrev}</div>
@@ -6550,8 +5763,8 @@ function buildExportHTML(userKey, locality, year, monthIndex0, todayStr, catHour
   for(let i=1; i<=trailing; i++){
     const keyNext = dayKey(nextYear, nextMonth0+1, i);
     const infoNext = (user.data && user.data[keyNext]) ? user.data[keyNext] : null;
-    const bgNext = infoNext ? getDayPrimaryShiftColor(infoNext, SHIFTS) : '#ffffff';
-    const labelNext = infoNext ? getDayPrimaryShiftLabel(infoNext, SHIFTS) : '';
+    const bgNext = infoNext ? getColorValue(infoNext) : '#ffffff';
+    const labelNext = infoNext ? (infoNext.mode==='simple' ? (infoNext.s||'') : (infoNext.sTop||'')) : '';
     const dayHTMLNext = `
       <div style="height:100px;position:relative;border:1px solid #e5e7eb;background:${bgNext};opacity:0.35;">
         <div style="position:absolute;top:6px;right:8px;font-size:14px;color:#111827;font-weight:700;">${i}</div>
@@ -6724,17 +5937,6 @@ let smartSyncPromise = null;
 let cloudUploadDecisionResolver = null;
 let localCloudUploadPending = false;
 
-// --- Persistencia de estado sync en localStorage ---
-// Guardamos el string raw del updated_at de la nube para comparación exacta sin problemas de precisión
-const LSKEY_CLOUD_TS_ACK = 'shifter_sync_cloud_ts_ack'; // último cloudTS reconocido (string ISO)
-const LSKEY_LOCAL_PENDING = 'shifter_local_pending';
-
-function getLastAckCloudTS(){ try{ return localStorage.getItem(LSKEY_CLOUD_TS_ACK) || ''; }catch(e){ return ''; } }
-function saveLastAckCloudTS(ts){ try{ if(ts) localStorage.setItem(LSKEY_CLOUD_TS_ACK, String(ts)); }catch(e){} }
-function getLocalPendingPersisted(){ return localStorage.getItem(LSKEY_LOCAL_PENDING) === 'true'; }
-function setLocalPendingPersisted(val){ try{ localStorage.setItem(LSKEY_LOCAL_PENDING, val ? 'true' : 'false'); }catch(e){} }
-function hasLocalPendingChanges(){ return !!(localCloudUploadPending || getLocalPendingPersisted()); }
-
 function getDeviceId(){
   try{
     const k='shifter_device_id';
@@ -6764,15 +5966,8 @@ function hasMeaningfulLocalData(snapshot){
   }
 }
 
-function applyCloudDb(newDb, {clearRemotePending=true, cloudTS=null} = {}){
+function applyCloudDb(newDb, {clearRemotePending=true} = {}){
   db = JSON.parse(JSON.stringify(newDb || db));
-  // Alinear _meta con el TS reconocido para que al recargar local === nube
-  if(cloudTS){
-    db._meta = db._meta || {};
-    db._meta.updated_at = cloudTS;
-    db._meta.device_id  = getDeviceId();
-    saveLastAckCloudTS(cloudTS);
-  }
   _origSaveDB();
   safeInitAfterCloudReplace();
   lastSyncTime = new Date();
@@ -6782,7 +5977,6 @@ function applyCloudDb(newDb, {clearRemotePending=true, cloudTS=null} = {}){
     dismissCloudBanner();
   }
   localCloudUploadPending = false;
-  setLocalPendingPersisted(false);
   dismissLocalUploadBanner();
   updateSyncStatusUI();
 }
@@ -7042,19 +6236,21 @@ async function pullFromCloud(){
 
 async function pushToCloud(){
   if(!isCloudEnabled()) throw new Error("No hay sesión en la nube.");
-  // Un solo timestamp para _meta Y para la columna → nunca quedan desfasados
-  const now = new Date().toISOString();
-  db._meta = db._meta || {};
-  db._meta.updated_at = now;
-  db._meta.device_id  = getDeviceId();
-  const payload = { user_id: sbUser.id, data: db, updated_at: now };
+  markLocalUpdated();
+  const nowISO = new Date().toISOString();
+  const payload = {
+    user_id: sbUser.id,
+    data: db,
+    updated_at: nowISO
+  };
   const {error} = await sb
     .from('shifter_state')
     .upsert(payload, { onConflict: 'user_id' });
   if(error) throw error;
-  saveLastAckCloudTS(now);      // guardar string exacto
-  setLocalPendingPersisted(false);
-  _origSaveDB();                 // persistir db con _meta actualizado sin re-disparar push
+  // Registrar el timestamp subido para evitar re-preguntar al próximo arranque
+  db._meta = db._meta || {};
+  db._meta.lastSyncedCloudTS = nowISO;
+  _origSaveDB();
 }
 
 // Merge inteligente: cloud gana en mes actual y futuro, local conserva meses pasados
@@ -7102,12 +6298,15 @@ async function smartInitialSync(){
 
   smartSyncPromise = (async () => {
     db._meta = db._meta || {};
+    const localTS = db._meta.updated_at ? Date.parse(db._meta.updated_at) : 0;
+    // lastSyncedCloudTS: timestamp de la versión de la nube con la que sincronizamos por última vez
+    const lastSyncedCloudTS = db._meta.lastSyncedCloudTS ? Date.parse(db._meta.lastSyncedCloudTS) : null;
     const localDbSnapshot = JSON.parse(JSON.stringify(db));
 
     try{
       const row = await pullFromCloud();
       if(!row){
-        // No hay datos en la nube → subir lo local
+        // No hay datos en la nube: subir local y registrar timestamp
         await pushToCloud();
         remoteConflictPending = false;
         lastRemotePayload = null;
@@ -7118,73 +6317,66 @@ async function smartInitialSync(){
         return;
       }
 
-      // Comparar el TS interno del dato (guardado en _meta), no el updated_at de la columna
-      // porque Supabase puede redondear el timestamp de la columna ligeramente.
-      const cloudInternalTS = row.data?._meta?.updated_at || row.updated_at || '';
-      const lastAckTS       = getLastAckCloudTS();   // string ISO del último TS procesado
-      const hasPending      = getLocalPendingPersisted();
-      const firstSync       = !lastAckTS;
-      const localHasData    = hasMeaningfulLocalData(localDbSnapshot);
-      // ¿La nube tiene algo distinto a lo que ya procesamos?
-      const cloudIsNew      = cloudInternalTS && cloudInternalTS !== lastAckTS;
+      const cloudTS = row.updated_at ? Date.parse(row.updated_at) : 0;
+      const localHasData = hasMeaningfulLocalData(localDbSnapshot);
 
-      if(!cloudIsNew && !hasPending){
-        // Exactamente igual a lo que ya procesamos → ya sincronizado, nada que hacer
+      // Detectar si hubo cambios reales desde la última sincronización exitosa
+      const cloudChangedSinceLastSync = lastSyncedCloudTS === null
+        ? (cloudTS > 0)
+        : (cloudTS > lastSyncedCloudTS);
+      const localChangedSinceLastSync = lastSyncedCloudTS === null
+        ? localHasData
+        : (localTS > lastSyncedCloudTS);
 
-      }else if(firstSync && localHasData){
-        // Primera vez con datos en ambos lados → preguntar
-        const choice = await openSyncDecisionModal();
-        if(choice === 'merge'){
-          const mergedDb = mergeSmartPull(row.data, localDbSnapshot);
-          applyCloudDb(mergedDb, {cloudTS: cloudInternalTS});
-        }else if(choice === 'cloud'){
-          applyCloudDb(row.data, {cloudTS: cloudInternalTS});
-        }else{
-          saveLastAckCloudTS(cloudInternalTS);
-          localCloudUploadPending = true;
-          setLocalPendingPersisted(true);
-        }
-
-      }else if(firstSync && !localHasData){
-        // Primera vez, local vacío → aplicar nube directamente sin preguntar
-        applyCloudDb(row.data, {cloudTS: cloudInternalTS});
-
-      }else if(cloudIsNew && hasPending){
-        // Conflicto real: nube cambió Y hay cambios locales → preguntar
-        const choice = await openSyncDecisionModal();
-        if(choice === 'merge'){
-          const mergedDb = mergeSmartPull(row.data, localDbSnapshot);
-          applyCloudDb(mergedDb, {cloudTS: cloudInternalTS});
-        }else if(choice === 'cloud'){
-          applyCloudDb(row.data, {cloudTS: cloudInternalTS});
-        }else{
-          saveLastAckCloudTS(cloudInternalTS);
-          localCloudUploadPending = true;
-          setLocalPendingPersisted(true);
-        }
-
-      }else if(cloudIsNew && !hasPending){
-        // Nube cambió, sin conflicto local → banner discreto, no modal bloqueante
-        remoteConflictPending = true;
-        lastRemotePayload = row;
-        showCloudUpdateBanner(hasLocalPendingChanges() ? 'conflict' : 'remote');
-        updateSyncStatusUI('pending-remote');
-
-      }else if(!cloudIsNew && hasPending){
-        // Nube igual, pero hay pendientes locales → banner de subida
-        localCloudUploadPending = true;
-        updateSyncStatusUI('pending-local');
-        showLocalUploadBanner();
+      if(!cloudChangedSinceLastSync && !localChangedSinceLastSync){
+        // Nada cambió desde la última sincronización: continuar sin preguntar
+        cloudInitReady = true;
+        lastSyncTime = new Date();
+        updateSyncStatusUI();
+        subscribeRealtime();
+        return;
       }
 
-      if(!remoteConflictPending){ lastRemotePayload = null; }
+      if(cloudChangedSinceLastSync && !localChangedSinceLastSync){
+        // Solo la nube tiene cambios nuevos: aplicar automáticamente sin preguntar
+        applyCloudDb(row.data);
+        db._meta.lastSyncedCloudTS = row.updated_at;
+        _origSaveDB();
+      } else if(!cloudChangedSinceLastSync && localChangedSinceLastSync){
+        // Solo el local tiene cambios: marcar como pendiente de subir
+        localCloudUploadPending = true;
+      } else {
+        // Ambos tienen cambios (conflicto real): preguntar al usuario
+        if(localHasData){
+          const choice = await openSyncDecisionModal();
+          if(choice === 'merge'){
+            const mergedDb = mergeSmartPull(row.data, localDbSnapshot);
+            applyCloudDb(mergedDb);
+            db._meta.lastSyncedCloudTS = row.updated_at;
+            _origSaveDB();
+          }else if(choice === 'cloud'){
+            applyCloudDb(row.data);
+            db._meta.lastSyncedCloudTS = row.updated_at;
+            _origSaveDB();
+          }else if(choice === 'keep-local'){
+            localCloudUploadPending = true;
+          }
+        }else{
+          applyCloudDb(row.data);
+          db._meta.lastSyncedCloudTS = row.updated_at;
+          _origSaveDB();
+        }
+      }
+
+      remoteConflictPending = false;
+      lastRemotePayload = null;
       lastSyncTime = new Date();
       cloudInitReady = true;
       updateSyncStatusUI();
       subscribeRealtime();
     }catch(e){
       console.error('smartInitialSync error:', e);
-      cloudInitReady = true;
+      cloudInitReady = true; // permitir operación normal aunque falle sync
       updateSyncStatusUI();
     }finally{
       smartSyncPromise = null;
@@ -7216,11 +6408,10 @@ function scheduleCloudPush(){
   if(!cloudInitReady) return;
   if(remoteConflictPending){
     updateSyncStatusUI('pending-remote');
-    showCloudUpdateBanner(hasLocalPendingChanges() ? 'conflict' : 'remote');
+    showCloudUpdateBanner();
     return;
   }
   localCloudUploadPending = true;
-  setLocalPendingPersisted(true);
   updateSyncStatusUI('pending-local');
   showLocalUploadBanner();
 }
@@ -7231,7 +6422,7 @@ async function manualSyncNow(){
     return;
   }
   if(remoteConflictPending){
-    showCloudUpdateBanner(hasLocalPendingChanges() ? 'conflict' : 'remote');
+    showCloudUpdateBanner();
     if(typeof toast === 'function') toast('Hay cambios pendientes de otro dispositivo. Decide primero qué hacer.');
     return;
   }
@@ -7255,7 +6446,7 @@ async function pullFromCloudUI(){
     const row = await pullFromCloud();
     if(!row){ return alert("No hay datos en la nube aún."); }
     if(!confirm("Esto reemplazará tus datos locales por los de la nube. ¿Continuar?")) return;
-    applyCloudDb(row.data || db, {cloudTS: row.updated_at});
+    applyCloudDb(row.data || db);
     alert("Datos de la nube aplicados.");
   }catch(e){
     alert("Error: " + (e.message||e));
@@ -7355,13 +6546,11 @@ function subscribeRealtime(){
         const row = payload?.new || {};
         const remoteData = row?.data || {};
         const remoteDevice = remoteData?._meta?.device_id;
-        const remoteTS = remoteData?._meta?.updated_at || row?.updated_at || '';
         const myDevice = getDeviceId();
-        const lastAck = getLastAckCloudTS();
-        if(remoteDevice && remoteDevice !== myDevice && remoteTS && remoteTS !== lastAck){
+        if(remoteDevice && remoteDevice !== myDevice){
           remoteConflictPending = true;
           lastRemotePayload = row;
-          showCloudUpdateBanner(hasLocalPendingChanges() ? 'conflict' : 'remote');
+          showCloudUpdateBanner();
           updateSyncStatusUI('pending-remote');
         }
       })
@@ -7369,38 +6558,22 @@ function subscribeRealtime(){
   }catch(e){ console.warn('Realtime subscribe error:', e); }
 }
 
-function showCloudUpdateBanner(mode = 'remote'){
+function showCloudUpdateBanner(){
   let banner = document.getElementById('cloudUpdateBanner');
-  const hasConflict = mode === 'conflict' || hasLocalPendingChanges();
   if(!banner){
     banner = document.createElement('div');
     banner.id = 'cloudUpdateBanner';
-    banner.style.cssText = 'position:fixed;top:78px;left:50%;transform:translateX(-50%);z-index:9999;background:#0f172a;color:#fff;padding:14px 16px;border-radius:18px;font-size:12px;font-weight:900;display:flex;gap:14px;align-items:center;max-width:min(94vw,760px);width:calc(100vw - 24px);box-shadow:0 8px 32px rgba(0,0,0,0.40);border:1px solid rgba(255,255,255,0.15);';
-    document.body.appendChild(banner);
-  }
-
-  if(hasConflict){
-    banner.innerHTML = `
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:13px;font-weight:900;margin-bottom:4px;line-height:1.2;">Conflicto entre nube y este dispositivo</div>
-        <div style="font-size:11px;opacity:0.88;font-weight:700;line-height:1.35;">Hay cambios nuevos en la nube y este dispositivo también conserva cambios locales. Nada se reemplazará automáticamente. Decide si deseas descargar la nube, fusionar, o subir tu versión local.</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-shrink:0;align-self:stretch;flex-wrap:wrap;justify-content:flex-end;">
-        <button onclick="useCloudVersionFromBanner()" style="background:#2563eb;border:none;color:#fff;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;font-size:11px;white-space:nowrap;">📥 Nube</button>
-        <button onclick="mergeRemoteFromBanner()" style="background:#22c55e;border:none;color:#fff;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;font-size:11px;white-space:nowrap;">🔀 Fusionar</button>
-        <button onclick="uploadLocalVersionOverRemote()" style="background:#f59e0b;border:none;color:#fff;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;font-size:11px;white-space:nowrap;">☁️ Subir lo mío</button>
-        <button onclick="dismissCloudBanner()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);color:#fff;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;font-size:11px;white-space:nowrap;">✕ Ignorar</button>
-      </div>`;
-  }else{
+    banner.style.cssText = 'position:fixed;top:78px;left:50%;transform:translateX(-50%);z-index:9999;background:#0f172a;color:#fff;padding:14px 16px;border-radius:18px;font-size:12px;font-weight:900;display:flex;gap:14px;align-items:center;max-width:min(94vw,620px);width:calc(100vw - 24px);';
     banner.innerHTML = `
       <div style="flex:1;min-width:0;">
         <div style="font-size:13px;font-weight:900;margin-bottom:4px;line-height:1.2;">Cambios detectados en otro dispositivo</div>
         <div style="font-size:11px;opacity:0.88;font-weight:700;line-height:1.35;">Hay una versión más reciente en la nube. El sistema no reemplazará tus datos por sí solo. Decide si deseas actualizar o ignorar por ahora.</div>
       </div>
-      <div style="display:flex;gap:8px;flex-shrink:0;align-self:stretch;flex-wrap:wrap;justify-content:flex-end;">
-        <button onclick="useCloudVersionFromBanner()" style="background:#22c55e;border:none;color:#fff;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;font-size:11px;white-space:nowrap;">✓ Actualizar</button>
+      <div style="display:flex;gap:8px;flex-shrink:0;align-self:stretch;">
+        <button onclick="pullLatestAndDismissBanner()" style="background:#22c55e;border:none;color:#fff;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;font-size:11px;white-space:nowrap;">✓ Actualizar</button>
         <button onclick="dismissCloudBanner()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);color:#fff;padding:10px 14px;border-radius:12px;font-weight:900;cursor:pointer;font-size:11px;white-space:nowrap;">✕ Ignorar</button>
       </div>`;
+    document.body.appendChild(banner);
   }
   banner.style.display = 'flex';
 }
@@ -7408,73 +6581,20 @@ function showCloudUpdateBanner(mode = 'remote'){
 function dismissCloudBanner(){
   const b = document.getElementById('cloudUpdateBanner');
   if(b) b.style.display = 'none';
-  // Guardar el TS de la nube como reconocido para no volver a mostrar al recargar
-  if(lastRemotePayload){
-    const ts = lastRemotePayload?.data?._meta?.updated_at || lastRemotePayload?.updated_at || '';
-    if(ts) saveLastAckCloudTS(ts);
-  }
-  remoteConflictPending = false;
-  lastRemotePayload = null;
-}
-
-async function useCloudVersionFromBanner(){
-  const b = document.getElementById('cloudUpdateBanner');
-  if(b) b.style.display = 'none';
-  try{
-    const row = lastRemotePayload || await pullFromCloud();
-    if(!row) return;
-    const cloudInternalTS = row.data?._meta?.updated_at || row.updated_at || '';
-    applyCloudDb(row.data || db, {cloudTS: cloudInternalTS});
-    remoteConflictPending = false;
-    lastRemotePayload = null;
-    toast && toast('✓ Se aplicó la versión de la nube');
-  }catch(e){
-    console.warn('useCloudVersionFromBanner error:', e);
-    updateSyncStatusUI('error');
-  }
-}
-
-async function mergeRemoteFromBanner(){
-  const b = document.getElementById('cloudUpdateBanner');
-  if(b) b.style.display = 'none';
-  try{
-    const row = lastRemotePayload || await pullFromCloud();
-    if(!row) return;
-    const cloudInternalTS = row.data?._meta?.updated_at || row.updated_at || '';
-    const localDbSnapshot = JSON.parse(JSON.stringify(db));
-    const mergedDb = mergeSmartPull(row.data, localDbSnapshot);
-    applyCloudDb(mergedDb, {cloudTS: cloudInternalTS});
-    remoteConflictPending = false;
-    lastRemotePayload = null;
-    toast && toast('✓ Datos fusionados correctamente');
-  }catch(e){
-    console.warn('mergeRemoteFromBanner error:', e);
-    updateSyncStatusUI('error');
-  }
-}
-
-async function uploadLocalVersionOverRemote(){
-  const b = document.getElementById('cloudUpdateBanner');
-  if(b) b.style.display = 'none';
-  try{
-    remoteConflictPending = false;
-    lastRemotePayload = null;
-    updateSyncStatusUI('pending');
-    await pushToCloud();
-    localCloudUploadPending = false;
-    setLocalPendingPersisted(false);
-    dismissLocalUploadBanner();
-    lastSyncTime = new Date();
-    updateSyncStatusUI('synced');
-    toast && toast('✓ Tu versión local se subió a la nube');
-  }catch(e){
-    console.warn('uploadLocalVersionOverRemote error:', e);
-    updateSyncStatusUI('error');
-  }
 }
 
 async function pullLatestAndDismissBanner(){
-  return mergeRemoteFromBanner();
+  dismissCloudBanner();
+  try{
+    const row = await pullFromCloud();
+    if(!row) return;
+    const localDbSnapshot = JSON.parse(JSON.stringify(db));
+    const mergedDb = mergeSmartPull(row.data, localDbSnapshot);
+    applyCloudDb(mergedDb);
+    toast && toast('Datos actualizados desde la nube');
+  }catch(e){
+    console.warn('pullLatest error:', e);
+  }
 }
 
 function showLocalUploadBanner(){
@@ -7505,12 +6625,12 @@ function dismissLocalUploadBanner(){
 async function confirmUploadLocalChanges(){
   dismissLocalUploadBanner();
   if(remoteConflictPending){
-    showCloudUpdateBanner(hasLocalPendingChanges() ? 'conflict' : 'remote');
+    showCloudUpdateBanner();
     return;
   }
   try{
     updateSyncStatusUI('pending');
-    await pushToCloud(); // guarda lastAckCloudTS y setLocalPendingPersisted(false)
+    await pushToCloud();
     localCloudUploadPending = false;
     lastSyncTime = new Date();
     updateSyncStatusUI('synced');
@@ -7522,117 +6642,14 @@ async function confirmUploadLocalChanges(){
 }
 
 function keepChangesLocalOnly(){
-  // El usuario elige no subir: limpiar flag para no seguir preguntando
   localCloudUploadPending = false;
-  setLocalPendingPersisted(false);
   dismissLocalUploadBanner();
   updateSyncStatusUI();
   if(typeof toast === 'function') toast('Cambios conservados solo en este dispositivo');
 }
 
-// ===== TOAST =====
-function toast(msg, duration = 2600){
-  let container = document.getElementById('toastContainer');
-  if(!container){
-    container = document.createElement('div');
-    container.id = 'toastContainer';
-    document.body.appendChild(container);
-  }
-  const el = document.createElement('div');
-  el.className = 'toast-item';
-  el.textContent = msg;
-  container.appendChild(el);
-  setTimeout(() => el.remove(), duration);
-}
-
-// ===== MODAL SINCRONIZACIÓN MANUAL =====
-function openManualSyncModal(){
-  let modal = document.getElementById('manualSyncModal');
-  if(!modal){
-    modal = document.createElement('div');
-    modal.id = 'manualSyncModal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
-    modal.innerHTML = `
-      <div style="background:#fff;border-radius:28px;width:100%;max-width:360px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.28);">
-        <div style="background:linear-gradient(135deg,#3b82f6,#1e40af);padding:20px 24px;color:#fff;">
-          <div style="font-size:15px;font-weight:900;margin-bottom:3px;">🔄 Sincronizar ahora</div>
-          <div style="font-size:11px;opacity:0.85;font-weight:600;">¿Qué deseas hacer con los datos?</div>
-        </div>
-        <div style="padding:16px;display:flex;flex-direction:column;gap:10px;">
-          <button id="msBtnUp" style="padding:14px 16px;border-radius:16px;border:none;background:#f0fdf4;color:#166534;font-weight:900;font-size:13px;cursor:pointer;text-align:left;border:1.5px solid #bbf7d0;">
-            ☁️ Subir mis datos a la nube
-            <div style="font-size:11px;font-weight:600;color:#16a34a;margin-top:3px;">Envía lo que tienes aquí a todos tus dispositivos.</div>
-          </button>
-          <button id="msBtnDown" style="padding:14px 16px;border-radius:16px;border:none;background:#eff6ff;color:#1e40af;font-weight:900;font-size:13px;cursor:pointer;text-align:left;border:1.5px solid #bfdbfe;">
-            📥 Traer datos de la nube
-            <div style="font-size:11px;font-weight:600;color:#2563eb;margin-top:3px;">Fusiona lo de la nube conservando tus meses anteriores.</div>
-          </button>
-          <button id="msBtnCheck" style="padding:14px 16px;border-radius:16px;border:none;background:#f8fafc;color:#374151;font-weight:900;font-size:13px;cursor:pointer;text-align:left;border:1.5px solid #e2e8f0;">
-            🔍 Solo verificar estado
-            <div style="font-size:11px;font-weight:600;color:#6b7280;margin-top:3px;">Compara nube vs local sin cambiar nada todavía.</div>
-          </button>
-          <button id="msBtnCancel" style="padding:10px;border-radius:14px;border:none;background:transparent;color:#9ca3af;font-weight:700;font-size:12px;cursor:pointer;">Cancelar</button>
-        </div>
-      </div>`;
-    document.body.appendChild(modal);
-
-    document.getElementById('msBtnUp').onclick = async () => {
-      modal.style.display = 'none';
-      try{
-        updateSyncStatusUI('pending');
-        await pushToCloud();
-        localCloudUploadPending = false;
-        lastSyncTime = new Date();
-        updateSyncStatusUI('synced');
-        toast('✓ Datos subidos a la nube correctamente');
-      }catch(e){ toast('❌ Error al subir: '+(e.message||e)); updateSyncStatusUI('error'); }
-    };
-    document.getElementById('msBtnDown').onclick = async () => {
-      modal.style.display = 'none';
-      try{
-        const row = await pullFromCloud();
-        if(!row){ toast('No hay datos en la nube aún.'); return; }
-        const cloudInternalTS = row.data?._meta?.updated_at || row.updated_at || '';
-        const snap = JSON.parse(JSON.stringify(db));
-        const merged = mergeSmartPull(row.data, snap);
-        applyCloudDb(merged, {cloudTS: cloudInternalTS});
-        toast('✓ Datos traídos y fusionados desde la nube');
-      }catch(e){ toast('❌ Error al traer: '+(e.message||e)); }
-    };
-    document.getElementById('msBtnCheck').onclick = async () => {
-      modal.style.display = 'none';
-      try{
-        const row = await pullFromCloud();
-        if(!row){ toast('La nube está vacía — sube tus datos.'); return; }
-        const cloudInternalTS = row.data?._meta?.updated_at || row.updated_at || '';
-        const lastAck = getLastAckCloudTS();
-        const isSame = cloudInternalTS && cloudInternalTS === lastAck;
-        const cloudDate = cloudInternalTS ? new Date(cloudInternalTS).toLocaleString('es',{dateStyle:'short',timeStyle:'short'}) : '?';
-        const localDate = db._meta?.updated_at ? new Date(db._meta.updated_at).toLocaleString('es',{dateStyle:'short',timeStyle:'short'}) : 'Sin timestamp';
-        toast(isSame ? `✓ Sincronizado — Nube: ${cloudDate}` : `⚠ Diferencia detectada — Nube: ${cloudDate} · Local: ${localDate}`);
-      }catch(e){ toast('❌ Error al verificar: '+(e.message||e)); }
-    };
-    document.getElementById('msBtnCancel').onclick = () => { modal.style.display = 'none'; };
-    modal.addEventListener('click', e => { if(e.target === modal) modal.style.display = 'none'; });
-  } else {
-    modal.style.display = 'flex';
-  }
-}
-
-async function manualSyncNow(){
-  if(!isCloudEnabled()){
-    openAuthModal();
-    return;
-  }
-  openManualSyncModal();
-}
-
 // Iniciar supabase al cargar
 window.addEventListener('load', () => {
-  // Restaurar estado de cambios locales pendientes desde sesión anterior
-  if(getLocalPendingPersisted()){
-    localCloudUploadPending = true;
-  }
   initSupabase();
 });
 
