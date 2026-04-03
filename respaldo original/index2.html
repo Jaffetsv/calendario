@@ -3256,7 +3256,6 @@ function calcSummary(){
 // =========================================================
 function openDay(key, info){
   activeKey = key;
-  deferLocalCloudBanner = true;
   // No dejar el selector de turnos abierto por defecto
   try { if (window._setTurnArea) window._setTurnArea(false); } catch(e) {}
   activePhotoData = (info && info.photoData) ? info.photoData : "";
@@ -3382,10 +3381,6 @@ function closeModal(){
   if (modal) modal.classList.remove('active');
   // Asegura que el selector de turnos no quede abierto entre días
   try { if (window._setTurnArea) window._setTurnArea(false); } catch(e) {}
-  deferLocalCloudBanner = false;
-  if(localCloudUploadPending && !remoteConflictPending){
-    showLocalUploadBanner();
-  }
 }
 
 function setMode(m){
@@ -3734,10 +3729,24 @@ if(btnOpenTurnPicker){
     const user = db.users[db.current];
     if (!user || !activeKey) return;
 
-    // Solo preparar el día como L dentro del modal.
-    // Se persiste hasta que el usuario presione Guardar.
+    // RESETEO A DEFAULT: el día queda explícitamente como L con comentario LIBRE
+    // (no se deja "sin data", para evitar inconsistencias visuales y de exportación)
     const noteLibre = 'LIBRE';
+    user.data[activeKey] = {
+      mode: 'simple',
+      s: 'L',
+      tIn: '00:00',
+      tOut: '00:00',
+      h: 0,
+      n: noteLibre
+    };
+
+    // Quitar foto si existía
+    if (user.data[activeKey].photoData) delete user.data[activeKey].photoData;
     activePhotoData = '';
+
+    // Persistir y resetear UI del modal
+    saveDB();
 
     selS = 'L';
     selT = 'L';
@@ -3787,10 +3796,13 @@ if(btnOpenTurnPicker){
 
     updateShiftCard(); 
     updateNotesPreview();
+    render(); 
+    renderSummaryCategories(); 
+    calcSummary();
 
     try { if (window._setTurnArea) window._setTurnArea(false); } catch(e) {}
 
-    toast('Día preparado como L - LIBRE. Presiona Guardar para confirmar.');
+    toast('Turno vaciado (L - LIBRE)');
   };
 
 // Modal: foto
@@ -3924,12 +3936,12 @@ function saveDay(){
 
   if (activePhotoData) data.photoData = activePhotoData;
   user.data[activeKey] = data;
-  try { if (window._setTurnArea) window._setTurnArea(false); } catch(e) {}
-  closeModal();
   saveDB();
   render();
   renderSummaryCategories();
   calcSummary();
+  try { if (window._setTurnArea) window._setTurnArea(false); } catch(e) {}
+  closeModal();
 }
 
 // =========================================================
@@ -6711,7 +6723,6 @@ let syncDecisionResolver = null;
 let smartSyncPromise = null;
 let cloudUploadDecisionResolver = null;
 let localCloudUploadPending = false;
-let deferLocalCloudBanner = false;
 
 // --- Persistencia de estado sync en localStorage ---
 // Guardamos el string raw del updated_at de la nube para comparación exacta sin problemas de precisión
@@ -7211,8 +7222,6 @@ function scheduleCloudPush(){
   localCloudUploadPending = true;
   setLocalPendingPersisted(true);
   updateSyncStatusUI('pending-local');
-  const dayModalOpen = !!document.getElementById('modal')?.classList.contains('active');
-  if(deferLocalCloudBanner || dayModalOpen) return;
   showLocalUploadBanner();
 }
 
