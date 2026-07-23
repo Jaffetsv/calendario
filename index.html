@@ -994,6 +994,28 @@
     .backup-card{border:1px solid #bae6fd;background:#f0f9ff;border-radius:16px;padding:12px}
     .status-chip{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:9px;font-weight:1000}
     .status-chip.safe{background:#dcfce7;color:#166534}.status-chip.warn{background:#fef3c7;color:#92400e}.status-chip.danger{background:#fee2e2;color:#991b1b}
+    /* Bitácora: estilos críticos independientes de Tailwind CDN. */
+    #historyModal{padding:10px!important}
+    .history-shell{width:min(100%,768px);max-height:88dvh;overflow:hidden;display:flex;flex-direction:column;background:#f8fafc;border-radius:28px;box-shadow:0 24px 70px rgba(15,23,42,.38);margin:0 auto}
+    .history-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px;background:linear-gradient(90deg,#0f172a,#172554);color:#fff}
+    .history-header>div{min-width:0}.history-header button{flex:0 0 auto}
+    .history-scroll{padding:16px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:20px}
+    .history-scroll section{min-width:0;width:100%}
+    .history-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    .history-toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .history-toolbar-actions button{border-radius:12px;padding:9px 12px;font-size:9px;font-weight:900;text-transform:uppercase}
+    .history-lock-note{margin-bottom:12px;border:1px solid #fde68a;background:#fffbeb;color:#78350f;border-radius:16px;padding:12px;font-size:10px;font-weight:800;line-height:1.45}
+    .audit-meta{display:flex;flex-wrap:wrap;gap:5px 12px;margin-top:8px;font-size:9px;font-weight:900;color:#64748b;text-transform:uppercase}
+    .audit-values{display:grid;gap:6px;margin-top:8px;font-size:10px;font-weight:800}
+    .audit-values>div{border-radius:12px;padding:8px 10px;line-height:1.35}
+    .audit-values>div:first-child{border:1px solid #fee2e2;background:#fff1f2;color:#881337}
+    .audit-values>div:last-child{border:1px solid #d1fae5;background:#ecfdf5;color:#065f46}
+    @media(max-width:520px){
+      .history-shell{max-height:92dvh;border-radius:22px}
+      .history-header{padding:16px}.history-scroll{padding:12px;gap:16px}
+      .history-toolbar{align-items:flex-start}.history-toolbar-actions{width:100%}.history-toolbar-actions button{flex:1}
+      .history-entry{padding:11px}.audit-meta{display:grid;grid-template-columns:1fr;gap:3px}
+    }
     @media (max-width:640px){
       .calendar-grid{gap:1px!important}
       .day-cell{contain:layout paint}
@@ -1014,6 +1036,8 @@
     .shift-label,.note-text,.mixto-top-note,.mixto-bottom-note{min-width:0;max-width:100%;}
     @media (max-width:640px){
       #monthNav{min-height:72px;padding-top:6px!important;padding-bottom:6px!important;}
+      body.calendar-six-weeks #monthNav{min-height:64px;padding-top:3px!important;padding-bottom:3px!important;}
+      body.calendar-six-weeks #weekHeader .wday{padding-top:5px!important;padding-bottom:5px!important;}
       #currentMonthLabel,#currentYearLabel{font-size:clamp(18px,5.8vw,23px)!important;}
       #weekHeader .wday{padding:7px 2px;font-size:9px;}
       .day-number{font-size:10px!important;padding:2px 4px!important;}
@@ -1756,42 +1780,37 @@
 
 <!-- Modal Historial / Bitácora / Respaldos -->
 <div id="historyModal" class="modal">
-  <div class="bg-slate-50 w-full max-w-3xl rounded-3xl md:rounded-[36px] shadow-2xl mx-2 max-h-[88vh] overflow-hidden flex flex-col">
-    <div class="bg-gradient-to-r from-slate-900 to-blue-950 text-white p-5 flex items-start justify-between gap-4">
+  <div class="history-shell bg-slate-50 w-full max-w-3xl rounded-3xl md:rounded-[36px] shadow-2xl mx-2 max-h-[88vh] overflow-hidden flex flex-col">
+    <div class="history-header bg-gradient-to-r from-slate-900 to-blue-950 text-white p-5 flex items-start justify-between gap-4">
       <div>
         <div class="text-[10px] uppercase tracking-[.18em] font-black text-blue-200">Control y trazabilidad</div>
-        <h3 class="text-lg font-black mt-1">Historial, respaldos y registro de cambios</h3>
-        <p class="text-[10px] font-bold text-white/70 mt-1">La bitácora y los respaldos automáticos se guardan localmente en este dispositivo.</p>
+        <h3 class="text-lg font-black mt-1">Bitácora de cambios del calendario</h3>
+        <p class="text-[10px] font-bold text-white/70 mt-1">Registra quién modificó cada fecha, cuándo lo hizo y cuál era el valor anterior y el nuevo.</p>
       </div>
       <button onclick="closeHistoryModal()" class="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-xl flex-shrink-0" aria-label="Cerrar">✕</button>
     </div>
-    <div class="p-4 md:p-5 overflow-y-auto space-y-5">
+    <div class="history-scroll p-4 md:p-5 overflow-y-auto space-y-5">
       <section>
+        <div class="history-toolbar flex items-center justify-between gap-3 mb-3 flex-wrap">
+          <div>
+            <h4 class="font-black text-[12px] uppercase text-slate-800">Cambios registrados</h4>
+            <p class="text-[10px] font-bold text-slate-500 mt-1">Turnos, horarios, notas, fotos, importaciones, restauraciones, asuetos y días cambiados a Libre.</p>
+          </div>
+          <div class="history-toolbar-actions flex gap-2">
+            <button onclick="exportActivityLog()" class="px-3 py-2 rounded-xl bg-blue-600 text-white text-[9px] font-black uppercase">Descargar bitácora</button>
+            <button onclick="clearActivityLog()" class="px-3 py-2 rounded-xl bg-white border border-red-200 text-red-700 text-[9px] font-black uppercase">🔒 Vaciar con PIN</button>
+          </div>
+        </div>
+        <div class="history-lock-note mb-3 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-[10px] font-bold text-amber-900">
+          No existe borrado individual. Para vaciar toda la bitácora se exige el PIN del perfil activo.
+        </div>
+        <div id="historyList" class="space-y-2"></div>
+      </section>
+      <section class="border-t border-slate-200 pt-5">
         <div class="flex items-center justify-between gap-3 mb-3">
           <div><h4 class="font-black text-[12px] uppercase text-slate-800">Respaldos de importación</h4><p class="text-[10px] font-bold text-slate-500 mt-1">Permiten deshacer las últimas importaciones Excel.</p></div>
         </div>
         <div id="importBackupsList" class="space-y-2"></div>
-      </section>
-      <section>
-        <div class="flex items-center justify-between gap-3 mb-3 flex-wrap">
-          <div><h4 class="font-black text-[12px] uppercase text-slate-800">Bitácora de actividad</h4><p class="text-[10px] font-bold text-slate-500 mt-1">Ediciones, importaciones y restauraciones recientes.</p></div>
-          <div class="flex gap-2">
-            <button onclick="exportActivityLog()" class="px-3 py-2 rounded-xl bg-blue-600 text-white text-[9px] font-black uppercase">Exportar JSON</button>
-            <button onclick="clearActivityLog()" class="px-3 py-2 rounded-xl bg-white border border-red-200 text-red-700 text-[9px] font-black uppercase">Vaciar</button>
-          </div>
-        </div>
-        <div id="historyList" class="space-y-2"></div>
-      </section>
-      <section class="rounded-2xl border border-indigo-100 bg-indigo-50 p-4">
-        <h4 class="font-black text-[12px] uppercase text-indigo-950">Registro de cambios · v24</h4>
-        <div class="mt-3 grid gap-2 text-[10px] font-bold text-indigo-900 leading-relaxed">
-          <div>✓ Mes y año destino autoritativos en importación Excel.</div>
-          <div>✓ Vista previa de sobrescrituras, confirmación detallada y respaldo restaurable.</div>
-          <div>✓ Mapeo seguro de perfiles, control de colisiones y validación de días del mes.</div>
-          <div>✓ Renderizado del calendario en un solo lote, navegación por teclado y mejor contraste.</div>
-          <div>✓ Librerías pesadas cargadas bajo demanda para iniciar más rápido.</div>
-          <div>✓ Manifest PWA adaptado a rutas de GitHub Pages.</div>
-        </div>
       </section>
     </div>
   </div>
@@ -2242,11 +2261,16 @@ let selectedColor = "Mañana";
 let importContext = null;
 
 
-const APP_VERSION = '24.0';
+const APP_VERSION = '24.2';
 const SHIFTER_ACTIVITY_KEY = 'shifter_v24_activity_log';
 const SHIFTER_IMPORT_BACKUP_KEY = 'shifter_v24_import_backups';
-const MAX_ACTIVITY_ENTRIES = 200;
+const MAX_ACTIVITY_ENTRIES = 1500;
 const MAX_IMPORT_BACKUPS = 5;
+const CALENDAR_AUDIT_TYPES = new Set([
+  'day-edit','day-paste','excel-import','image-import','restore','profile-merge',
+  'holiday-add','holiday-edit','holiday-delete'
+]);
+let historyRenderLimit = 160;
 const LIBRARY_URLS = {
   xlsx: [
     'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
@@ -2313,18 +2337,164 @@ function ensureXLSXLoaded(){ return loadScriptOnce('xlsx','XLSX'); }
 function ensureTesseractLoaded(){ return loadScriptOnce('tesseract','Tesseract'); }
 function ensureHtml2CanvasLoaded(){ return loadScriptOnce('html2canvas','html2canvas'); }
 
+function auditActorName(explicitActor){
+  return String(explicitActor || db?.current || 'Usuario no identificado').trim() || 'Usuario no identificado';
+}
+function compactDayForAudit(info){
+  if(!info || typeof info !== 'object'){
+    return { mode:'simple', shifts:['L'], hours:'0', note:'', photo:false, empty:true };
+  }
+  if(info.mode === 'mixto'){
+    const top = String(info.t || info.top || 'L').trim() || 'L';
+    const bottom = String(info.b || info.bottom || 'L').trim() || 'L';
+    const noteTop = String(info.noteTop || '').trim();
+    const noteBottom = String(info.noteBottom || '').trim();
+    return {
+      mode:'mixto', shifts:[top,bottom],
+      hours:`${Number(info.hrsTop || 0)} + ${Number(info.hrsBottom || 0)}`,
+      note:[noteTop,noteBottom].filter(Boolean).join(' | '),
+      photo:!!info.photoData,
+      empty:isEffectivelyEmptyDayData(info)
+    };
+  }
+  const shift = String(info.s || info.shift || 'L').trim() || 'L';
+  const tIn = String(info.tIn || '').trim();
+  const tOut = String(info.tOut || '').trim();
+  return {
+    mode:'simple', shifts:[shift],
+    hours:(tIn || tOut) ? `${tIn || '00:00'}–${tOut || '00:00'}` : String(Number(info.h || 0)),
+    note:String(info.n || info.note || info.comment || '').trim(),
+    photo:!!info.photoData,
+    empty:isEffectivelyEmptyDayData(info)
+  };
+}
+function auditValueEquals(a,b){
+  return JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+}
+function formatAuditDayState(value){
+  const d = value && value.shifts ? value : compactDayForAudit(value);
+  const shifts = (d.shifts || ['L']).join(' + ');
+  const parts = [shifts];
+  if(d.hours && d.hours !== '0' && d.hours !== '00:00–00:00') parts.push(d.hours);
+  if(d.note) parts.push(d.note);
+  if(d.photo) parts.push('con foto');
+  return parts.join(' · ');
+}
+function classifyCalendarDayChange(previous,next,type){
+  if(type === 'day-paste') return 'Turno pegado';
+  if(type === 'excel-import') return 'Cambio por importación Excel';
+  if(type === 'image-import') return 'Cambio por importación de imagen';
+  if(type === 'restore') return 'Cambio restaurado';
+  if(type === 'profile-merge') return 'Cambio por fusión de perfiles';
+  const before = compactDayForAudit(previous);
+  const after = compactDayForAudit(next);
+  const beforeShift = (before.shifts || ['L']).join(' + ');
+  const afterShift = (after.shifts || ['L']).join(' + ');
+  if(afterShift === 'L' && beforeShift !== 'L') return 'Día cambiado a Libre';
+  if(beforeShift !== afterShift) return 'Turno cambiado';
+  if(before.mode !== after.mode) return 'Modalidad de turno cambiada';
+  if(before.photo !== after.photo) return after.photo ? 'Foto agregada' : 'Foto eliminada';
+  if(before.hours !== after.hours) return 'Horario modificado';
+  if(before.note !== after.note) return 'Nota modificada';
+  return 'Día actualizado';
+}
+function normalizeAuditEntry(entry){
+  if(!entry || !CALENDAR_AUDIT_TYPES.has(entry.type)) return null;
+  const meta = entry.meta || {};
+  let profile = entry.profile || meta.profile || '';
+  let dateKey = entry.dateKey || meta.dateKey || '';
+  if((!profile || !dateKey) && typeof entry.detail === 'string'){
+    const match = entry.detail.match(/^(.+?)\s·\s(\d{4}-\d{1,2}-\d{1,2})$/);
+    if(match){ profile = profile || match[1]; dateKey = dateKey || match[2]; }
+  }
+  // La bitácora muestra cambios vinculados a una fecha concreta del calendario.
+  // Se descartan registros generales heredados (versiones, exportaciones y resúmenes sin fecha).
+  if(!dateKey) return null;
+  return {
+    ...entry,
+    actor:auditActorName(entry.actor || meta.actor || profile),
+    profile:profile || 'General',
+    dateKey,
+    kind:entry.kind || meta.kind || (entry.type.startsWith('holiday-') ? 'holiday' : 'day'),
+    before:entry.before ?? meta.previous ?? null,
+    after:entry.after ?? meta.next ?? null,
+    source:entry.source || meta.source || ''
+  };
+}
 function getActivityLog(){
-  return safeParseJSON(localStorage.getItem(SHIFTER_ACTIVITY_KEY), []);
+  const raw = safeParseJSON(localStorage.getItem(SHIFTER_ACTIVITY_KEY), []);
+  return Array.isArray(raw) ? raw.map(normalizeAuditEntry).filter(Boolean) : [];
+}
+function persistAuditEntries(newEntries){
+  if(!Array.isArray(newEntries) || !newEntries.length) return;
+  try{
+    const existing = getActivityLog();
+    const valid = newEntries.map(normalizeAuditEntry).filter(Boolean);
+    localStorage.setItem(SHIFTER_ACTIVITY_KEY, JSON.stringify([...valid.reverse(), ...existing].slice(0, MAX_ACTIVITY_ENTRIES)));
+  }catch(e){ console.warn('No se pudo registrar el cambio del calendario', e); }
 }
 function addActivityLog(type, title, detail = '', meta = {}, level = 'info'){
-  try{
-    const entries = getActivityLog();
-    entries.unshift({
-      id: `log_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
-      at: new Date().toISOString(), type, title, detail, meta, level, version: APP_VERSION
+  if(!CALENDAR_AUDIT_TYPES.has(type)) return;
+  const entry = {
+    id:`log_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,
+    at:new Date().toISOString(), type, title, detail, meta, level, version:APP_VERSION,
+    actor:auditActorName(meta.actor), profile:meta.profile || db?.current || 'General',
+    dateKey:meta.dateKey || '', kind:meta.kind || (type.startsWith('holiday-') ? 'holiday' : 'day'),
+    before:meta.previous ?? null, after:meta.next ?? null, source:meta.source || ''
+  };
+  persistAuditEntries([entry]);
+}
+function recordCalendarDayChanges(changes, options = {}){
+  if(!Array.isArray(changes) || !changes.length) return 0;
+  const actor = auditActorName(options.actor);
+  const type = options.type || 'day-edit';
+  const source = options.source || '';
+  const baseTime = Date.now();
+  const entries = [];
+  changes.forEach((change,index) => {
+    const before = compactDayForAudit(change.previous);
+    const after = compactDayForAudit(change.next);
+    if(auditValueEquals(before,after)) return;
+    const action = change.title || classifyCalendarDayChange(change.previous,change.next,type);
+    entries.push({
+      id:`log_${baseTime}_${index}_${Math.random().toString(36).slice(2,6)}`,
+      at:new Date(baseTime + index).toISOString(), type, title:action,
+      detail:change.detail || `${formatAuditDayState(before)} → ${formatAuditDayState(after)}`,
+      meta:{ actor, profile:change.profile, dateKey:change.dateKey, source, ...change.meta },
+      level:options.level || 'success', version:APP_VERSION,
+      actor, profile:change.profile || db?.current || 'General', dateKey:change.dateKey || '',
+      kind:'day', before, after, source
     });
-    localStorage.setItem(SHIFTER_ACTIVITY_KEY, JSON.stringify(entries.slice(0, MAX_ACTIVITY_ENTRIES)));
-  }catch(e){ console.warn('No se pudo registrar actividad', e); }
+  });
+  persistAuditEntries(entries);
+  return entries.length;
+}
+function recordCalendarDayChange(type, actor, profile, dateKey, previous, next, extra = {}){
+  return recordCalendarDayChanges([{profile,dateKey,previous,next,detail:extra.detail,meta:extra.meta}],{
+    type, actor, source:extra.source || '', level:extra.level || 'success'
+  });
+}
+function recordHolidayChanges(changes, options = {}){
+  if(!Array.isArray(changes) || !changes.length) return 0;
+  const actor = auditActorName(options.actor);
+  const baseTime = Date.now();
+  const entries = [];
+  changes.forEach((change,index) => {
+    if(auditValueEquals(change.previous,change.next)) return;
+    const type = change.type || options.type || 'holiday-edit';
+    const title = type === 'holiday-add' ? 'Asueto agregado' : type === 'holiday-delete' ? 'Asueto eliminado' : 'Asueto modificado';
+    const fmt = value => value ? `${value.name || 'Asueto'} · ${value.location || 'General'}` : 'Sin asueto';
+    entries.push({
+      id:`log_${baseTime}_${index}_${Math.random().toString(36).slice(2,6)}`,
+      at:new Date(baseTime + index).toISOString(), type, title,
+      detail:`${fmt(change.previous)} → ${fmt(change.next)}`,
+      meta:{actor,profile:'Configuración general',dateKey:change.dateKey,kind:'holiday'},
+      level:'success',version:APP_VERSION,actor,profile:'Configuración general',
+      dateKey:change.dateKey || '',kind:'holiday',before:change.previous || null,after:change.next || null,source:'asuetos'
+    });
+  });
+  persistAuditEntries(entries);
+  return entries.length;
 }
 function getImportBackups(){
   return safeParseJSON(localStorage.getItem(SHIFTER_IMPORT_BACKUP_KEY), []);
@@ -2366,7 +2536,20 @@ function captureImportSnapshot(target, profileNames){
 function restoreImportSnapshot(snapshot, options = {}){
   if(!snapshot || !snapshot.target || !Array.isArray(snapshot.profiles)) throw new Error('Respaldo inválido.');
   const prefix = `${snapshot.target.year}-${snapshot.target.monthIndex0 + 1}-`;
+  const actor = auditActorName(options.actor || db.current);
+  const changes = [];
   snapshot.profiles.forEach(item => {
+    const currentUser = db.users?.[item.name];
+    const beforeMonth = {};
+    Object.keys(currentUser?.data || {}).forEach(key => {
+      if(key.startsWith(prefix)) beforeMonth[key] = cloneJSON(currentUser.data[key]);
+    });
+    const restoredMonth = item.existed ? cloneJSON(item.monthData || {}) : {};
+    const allKeys = new Set([...Object.keys(beforeMonth), ...Object.keys(restoredMonth)]);
+    allKeys.forEach(key => changes.push({
+      profile:item.name,dateKey:key,previous:beforeMonth[key] || null,next:restoredMonth[key] || null
+    }));
+
     if(!item.existed){
       if(db.users?.[item.name]) delete db.users[item.name];
       return;
@@ -2376,7 +2559,7 @@ function restoreImportSnapshot(snapshot, options = {}){
     user.config = cloneJSON(item.config || user.config || {});
     user.data = user.data || {};
     Object.keys(user.data).forEach(key => { if(key.startsWith(prefix)) delete user.data[key]; });
-    Object.assign(user.data, cloneJSON(item.monthData || {}));
+    Object.assign(user.data, restoredMonth);
   });
   const prev = snapshot.previousView || {};
   const firstExisting = snapshot.profiles.map(p => p.name).find(n => db.users?.[n]);
@@ -2385,7 +2568,7 @@ function restoreImportSnapshot(snapshot, options = {}){
   saveDB();
   updateUserDropdown(); updateUserInitial(); updateMonthDisplay(); render(); renderSummaryCategories(); calcSummary();
   if(options.log !== false){
-    addActivityLog('restore','Importación restaurada',`${MONTHS[snapshot.target.monthIndex0]} ${snapshot.target.year}`,{backupId:snapshot.id},'success');
+    recordCalendarDayChanges(changes,{type:'restore',actor,source:'respaldo de importación'});
   }
 }
 function restoreImportBackup(id){
@@ -2400,21 +2583,56 @@ function restoreImportBackup(id){
   }catch(e){ console.error(e); alert(`No se pudo restaurar: ${e.message}`); }
 }
 function openHistoryModal(){
+  historyRenderLimit = 160;
   renderHistoryModal();
   document.getElementById('historyModal')?.classList.add('active');
 }
 function closeHistoryModal(){ document.getElementById('historyModal')?.classList.remove('active'); }
+function formatAuditCalendarDate(dateKey){
+  if(!dateKey) return 'Fecha general';
+  const parts = String(dateKey).split('-').map(Number);
+  if(parts.length !== 3 || parts.some(n => !Number.isFinite(n))) return dateKey;
+  const dt = new Date(parts[0],parts[1]-1,parts[2]);
+  return dt.toLocaleDateString('es-SV',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+}
+function formatHolidayAuditState(value){
+  if(!value) return 'Sin asueto';
+  return `${value.name || 'Asueto'} · ${value.location || 'General'}`;
+}
+function showMoreHistory(){ historyRenderLimit += 160; renderHistoryModal(); }
 function renderHistoryModal(){
   const historyBox = document.getElementById('historyList');
   const backupBox = document.getElementById('importBackupsList');
   if(historyBox){
     const entries = getActivityLog();
-    historyBox.innerHTML = entries.length ? entries.slice(0,80).map(entry => {
+    const shown = entries.slice(0,historyRenderLimit);
+    const cards = shown.map(entry => {
       const date = new Date(entry.at);
-      const when = Number.isNaN(date.getTime()) ? entry.at : date.toLocaleString('es-SV',{dateStyle:'short',timeStyle:'short'});
+      const when = Number.isNaN(date.getTime()) ? entry.at : date.toLocaleString('es-SV',{dateStyle:'medium',timeStyle:'short'});
       const levelClass = entry.level === 'error' ? 'danger' : entry.level === 'warning' ? 'warn' : 'safe';
-      return `<div class="history-entry"><div class="flex items-start justify-between gap-3"><div class="history-title">${escapeHTML(entry.title || entry.type || 'Actividad')}</div><span class="status-chip ${levelClass}">${escapeHTML(entry.type || 'evento')}</span></div><time>${escapeHTML(when)}</time>${entry.detail ? `<div class="history-detail">${escapeHTML(entry.detail)}</div>` : ''}</div>`;
-    }).join('') : '<div class="rounded-2xl border border-dashed border-slate-300 p-5 text-center text-[10px] font-bold text-slate-500">Todavía no hay actividad registrada.</div>';
+      const beforeText = entry.kind === 'holiday' ? formatHolidayAuditState(entry.before) : formatAuditDayState(entry.before);
+      const afterText = entry.kind === 'holiday' ? formatHolidayAuditState(entry.after) : formatAuditDayState(entry.after);
+      return `<div class="history-entry">
+        <div class="flex items-start justify-between gap-3">
+          <div class="history-title">${escapeHTML(entry.title || 'Cambio de calendario')}</div>
+          <span class="status-chip ${levelClass}">${escapeHTML(entry.type || 'cambio')}</span>
+        </div>
+        <div class="audit-meta mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[9px] font-black text-slate-500 uppercase">
+          <span>👤 ${escapeHTML(entry.actor || 'Usuario no identificado')}</span>
+          <span>📋 ${escapeHTML(entry.profile || 'General')}</span>
+          <span>🗓️ ${escapeHTML(formatAuditCalendarDate(entry.dateKey))}</span>
+        </div>
+        <time>${escapeHTML(when)}</time>
+        <div class="audit-values mt-2 grid gap-1.5 text-[10px] font-bold">
+          <div class="rounded-xl bg-red-50 border border-red-100 px-3 py-2 text-red-900"><strong>Antes:</strong> ${escapeHTML(beforeText)}</div>
+          <div class="rounded-xl bg-emerald-50 border border-emerald-100 px-3 py-2 text-emerald-900"><strong>Después:</strong> ${escapeHTML(afterText)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    const more = entries.length > historyRenderLimit
+      ? `<button onclick="showMoreHistory()" class="w-full mt-3 p-3 rounded-2xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-[10px] font-black uppercase">Mostrar 160 cambios más · ${entries.length-historyRenderLimit} pendientes</button>`
+      : '';
+    historyBox.innerHTML = entries.length ? cards + more : '<div class="rounded-2xl border border-dashed border-slate-300 p-5 text-center text-[10px] font-bold text-slate-500">Todavía no hay cambios del calendario registrados.</div>';
   }
   if(backupBox){
     const backups = getImportBackups();
@@ -2427,21 +2645,27 @@ function renderHistoryModal(){
   }
 }
 function exportActivityLog(){
-  const payload = { app:'Shifter Pro', version:APP_VERSION, exportedAt:new Date().toISOString(), activity:getActivityLog(), importBackups:getImportBackups().map(b => ({id:b.id,createdAt:b.createdAt,target:b.target,profiles:(b.profiles||[]).map(p=>p.name)})) };
+  const payload = { app:'Shifter Pro', version:APP_VERSION, exportedAt:new Date().toISOString(), calendarChanges:getActivityLog() };
   const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
-  a.href = url; a.download = `shifter_historial_${new Date().toISOString().slice(0,10)}.json`; a.click();
+  a.href = url; a.download = `shifter_bitacora_calendario_${new Date().toISOString().slice(0,10)}.json`; a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function clearActivityLog(){
-  if(!confirm('¿Vaciar la bitácora de actividad? Los respaldos de importación se conservarán.')) return;
-  localStorage.removeItem(SHIFTER_ACTIVITY_KEY); renderHistoryModal();
+  const actor = db?.current;
+  const user = db?.users?.[actor];
+  if(!user) return alert('No se pudo identificar el perfil activo.');
+  const pin = prompt(`Ingresa el PIN del perfil ${actor} para vaciar la bitácora:`);
+  if(pin === null) return;
+  if(pin !== user.pin && pin !== ADMIN_UNIVERSAL_PIN) return alert('PIN incorrecto. La bitácora no fue modificada.');
+  if(!confirm('¿Vaciar definitivamente toda la bitácora de cambios? Los respaldos de importación se conservarán.')) return;
+  localStorage.removeItem(SHIFTER_ACTIVITY_KEY);
+  historyRenderLimit = 160;
+  renderHistoryModal();
+  alert('Bitácora vaciada correctamente.');
 }
 function ensureVersionLog(){
-  const key = `shifter_version_logged_${APP_VERSION}`;
-  if(localStorage.getItem(key)) return;
-  addActivityLog('system',`Shifter Pro v${APP_VERSION} activado`,'Mejoras de importación, respaldos, rendimiento, claridad y PWA.',{},'success');
-  localStorage.setItem(key,'1');
+  // La bitácora se reserva exclusivamente para cambios reales del calendario.
 }
 
 function getSelectedImportTarget(){
@@ -3056,8 +3280,9 @@ function init(){
   calcSummary();
   updateUIEditMode();
   
-  // Mostrar primera pestaña de configuración
+  // Mostrar primera pestaña de configuración y fijar la vista calendario sin scroll de página.
   showConfigTab('turnos');
+  showView('calendar');
 }
 
 function loadDefaultHolidays(){
@@ -3455,6 +3680,13 @@ function render(){
   const firstDayMonday = firstDay === 0 ? 6 : firstDay - 1;
   const lastDate = new Date(y, m + 1, 0).getDate();
   const prevLastDate = new Date(y, m, 0).getDate();
+  const requiredRows = Math.ceil((firstDayMonday + lastDate) / 7);
+  grid.dataset.weekRows = String(requiredRows);
+  grid.setAttribute('aria-rowcount', String(requiredRows));
+  document.body.classList.toggle('calendar-four-weeks', requiredRows === 4);
+  document.body.classList.toggle('calendar-five-weeks', requiredRows === 5);
+  document.body.classList.toggle('calendar-six-weeks', requiredRows === 6);
+  document.documentElement.style.setProperty('--calendar-week-count', String(requiredRows));
   
   // Días del mes anterior
   for(let i = firstDayMonday; i > 0; i--){
@@ -3480,7 +3712,8 @@ function render(){
   
   // Días del mes siguiente
   const total = firstDayMonday + lastDate;
-  const trailing = (7 - (total % 7)) % 7;
+  // Completar únicamente las semanas que el mes necesita: 4, 5 o 6.
+  const trailing = (requiredRows * 7) - total;
   for(let i = 1; i <= trailing; i++){
     const nextMonth = m === 11 ? 1 : m + 2;
     const nextYear = m === 11 ? y + 1 : y;
@@ -4275,13 +4508,15 @@ function copyShift(key){
 }
 
 function pasteTo(key){
-  const user = db.users[db.current]; if(!user) return;
+  const actor = db.current;
+  const user = db.users[actor]; if(!user) return;
   const src = clipboardDayData || clipboardShiftOnly;
   if(!src) return;
   const previous = cloneJSON(user.data[key] || null);
   user.data[key] = deepCopy(src);
+  const next = cloneJSON(user.data[key]);
   saveDB();
-  addActivityLog('day-paste','Turno pegado',`${db.current} · ${key}`,{previous,next:user.data[key]},'success');
+  recordCalendarDayChange('day-paste',actor,actor,key,previous,next,{source:'pegado'});
   render(); renderSummaryCategories(); calcSummary();
 }
 
@@ -4553,7 +4788,7 @@ function saveDay(){
   try { if (window._setTurnArea) window._setTurnArea(false); } catch(e) {}
   closeModal();
   saveDB();
-  addActivityLog('day-edit','Día actualizado',`${db.current} · ${activeKey}`,{previous:previousDayData,next:data},'success');
+  recordCalendarDayChange('day-edit',db.current,db.current,activeKey,previousDayData,data,{source:'edición manual'});
   render();
   renderSummaryCategories();
   calcSummary();
@@ -5176,10 +5411,12 @@ function addNewHoliday(){
   const dt = new Date(dateInput + 'T00:00:00');
   const key = dayKey(dt.getFullYear(), dt.getMonth() + 1, dt.getDate());
   
+  const previousHoliday = cloneJSON(db.holidays[key] || null);
   db.holidays[key] = {
     name: name,
     location: loc
   };
+  recordHolidayChanges([{type:previousHoliday?'holiday-edit':'holiday-add',dateKey:key,previous:previousHoliday,next:cloneJSON(db.holidays[key])}],{actor:db.current});
   
   document.getElementById('newHolidayDate').value = '';
   document.getElementById('newHolidayName').value = '';
@@ -5194,7 +5431,9 @@ function deleteHoliday(k){
   
   if(!confirm(`¿Eliminar asueto del ${k}?`)) return;
   
+  const previousHoliday = cloneJSON(db.holidays[k] || null);
   delete db.holidays[k];
+  recordHolidayChanges([{type:'holiday-delete',dateKey:k,previous:previousHoliday,next:null}],{actor:db.current});
   saveDB();
   renderHolidays();
   render();
@@ -5204,6 +5443,7 @@ function deleteHoliday(k){
 function saveHolidays(){
   if(!isEditMode()) return alert("Activa modo edición.");
   
+  const previousHolidays = cloneJSON(db.holidays || {});
   const newHolidays = {};
   const keys = Object.keys(db.holidays);
   
@@ -5225,6 +5465,15 @@ function saveHolidays(){
   });
   
   db.holidays = newHolidays;
+  const holidayChanges = [];
+  const holidayKeys = new Set([...Object.keys(previousHolidays),...Object.keys(newHolidays)]);
+  holidayKeys.forEach(key => {
+    const previous = previousHolidays[key] || null;
+    const next = newHolidays[key] || null;
+    if(auditValueEquals(previous,next)) return;
+    holidayChanges.push({type:!previous?'holiday-add':!next?'holiday-delete':'holiday-edit',dateKey:key,previous,next});
+  });
+  recordHolidayChanges(holidayChanges,{actor:db.current});
   saveDB();
   renderHolidays();
   render();
@@ -5515,6 +5764,7 @@ function detectDuplicateProfiles(){
 }
 
 function mergeProfiles(source, target){
+  const auditActor = db.current;
   if(!source || !target) return alert("Selecciona origen y destino.");
   if(source === target) return alert("El origen y destino no pueden ser el mismo perfil.");
   if(!db.users[source] || !db.users[target]) return alert("Uno de los perfiles no existe.");
@@ -5522,10 +5772,13 @@ function mergeProfiles(source, target){
 
   const srcData = db.users[source].data || {};
   const tgtData = db.users[target].data || {};
+  const calendarChanges = [];
 
   Object.keys(srcData).forEach(key => {
     if(isEffectivelyEmptyDayData(tgtData[key])){
+      const previous = cloneJSON(tgtData[key] || null);
       tgtData[key] = JSON.parse(JSON.stringify(srcData[key]));
+      calendarChanges.push({profile:target,dateKey:key,previous,next:cloneJSON(tgtData[key])});
     }
   });
   db.users[target].data = tgtData;
@@ -5534,7 +5787,7 @@ function mergeProfiles(source, target){
   delete db.users[source];
 
   saveDB();
-  addActivityLog('profile-merge','Perfiles fusionados',`${source} → ${target}`,{},'warning');
+  recordCalendarDayChanges(calendarChanges,{type:'profile-merge',actor:auditActor,source:`fusión ${source} → ${target}`,level:'warning'});
   updateUserDropdown();
   updateUserInitial();
   render();
@@ -6149,16 +6402,18 @@ function applyOCRResults(){
   const month = parseInt(document.getElementById('imgImportMonth').value, 10) + 1;
   const shift = document.getElementById('imgImportShift')?.value || 'CENA';
   const mode = document.getElementById('imgImportMode')?.value || 'replace';
-  const user = db.users[db.current];
+  const actor = db.current;
+  const user = db.users[actor];
   if(!user) return;
 
   ensureCanonicalCoreShiftsForUser(user);
 
   let applied = 0;
   let skipped = 0;
+  const calendarChanges = [];
   selected.forEach(e => {
     const key = dayKey(year, month, e.day);
-    const prev = user.data[key] || {};
+    const prev = cloneJSON(user.data[key] || null);
     if(mode === 'merge' && !isPracticallyEmptyForOCRImport(prev)){
       skipped++;
       return;
@@ -6176,11 +6431,12 @@ function applyOCRResults(){
     };
 
     user.data[key] = nextDay;
+    calendarChanges.push({profile:actor,dateKey:key,previous:prev,next:cloneJSON(nextDay)});
     applied++;
   });
 
   saveDB();
-  addActivityLog('image-import','Importación desde imagen',`${db.current}: ${applied} día(s) con turno ${shift}.`,{applied,skipped,month,year},'success');
+  recordCalendarDayChanges(calendarChanges,{type:'image-import',actor,source:'importación de imagen'});
   render();
   renderSummaryCategories();
   calcSummary();
@@ -6571,15 +6827,27 @@ function runImportSelected(){
   const message=`CONFIRMACIÓN DE IMPORTACIÓN\n\nDestino autoritativo: ${MONTHS[target.monthIndex0]} ${target.year}\nModo: ${mode==='replace'?'REEMPLAZAR DÍAS PRESENTES':'COMBINAR SOLO VACÍOS'}\nPerfiles: ${plan.resolvedNames.join(', ')}\nCeldas a escribir: ${plan.writable}.${overwrite}${partial}${ignored}${invalid}\n\nLa fecha detectada en el Excel NO cambiará este destino. ¿Continuar?`;
   if(!confirm(message)) return;
 
+  const auditActor=db.current;
   const snapshot=captureImportSnapshot(target,plan.resolvedNames);
   const backupStored=persistImportBackup(snapshot);
   if(!backupStored && plan.overwriteCount>0 && !confirm('No fue posible guardar el respaldo automático por falta de espacio local. ¿Continuar sin respaldo?')) return;
 
   setImportBusy(true,'Aplicando importación…');
   let written=0,cleared=0,mergeSkipped=0,invalidCodes=0;
+  const previousByCell=new Map();
+  const calendarChanges=[];
   try{
     // Crear perfiles solo después de confirmar y capturar el respaldo.
     plan.resolvedNames.forEach(name=>ensureUserExists(name));
+    selected.forEach(source=>{
+      const row=plan.rowsBySource.get(source); if(!row) return;
+      const userKey=plan.resolvedBySource[source];
+      const user=db.users[userKey]; if(!user) return;
+      plan.validDays.forEach(day=>{
+        const key=dayKey(target.year,target.monthIndex0+1,day);
+        previousByCell.set(`${userKey}|${key}`,cloneJSON(user.data?.[key] || null));
+      });
+    });
     if(mode==='replace'){
       // Una celda solo se limpia cuando su valor entrante es válido; un código malformado nunca borra datos previos.
       selected.forEach(source=>{
@@ -6607,14 +6875,16 @@ function runImportSelected(){
         if(mode==='merge'&&!isEffectivelyEmptyDayData(user.data[key])){ mergeSkipped++; return; }
         ensureShiftExistsForUser(userKey,def,true);
         const tIn=def.in||'00:00',tOut=def.out||'00:00';
-        user.data[key]={mode:'simple',s:def.key,tIn,tOut,h:calculateHours(tIn,tOut),n:def.note||((tIn!=='00:00'||tOut!=='00:00')?`${tIn}-${tOut}`:(def.label||def.key).toUpperCase()),importMeta:{source:'excel',file:importContext.fileMeta?.name||'',sheet:importContext.sheetName,importedAt:new Date().toISOString(),targetMonth:target.monthIndex0,targetYear:target.year}};
+        const nextDay={mode:'simple',s:def.key,tIn,tOut,h:calculateHours(tIn,tOut),n:def.note||((tIn!=='00:00'||tOut!=='00:00')?`${tIn}-${tOut}`:(def.label||def.key).toUpperCase()),importMeta:{source:'excel',file:importContext.fileMeta?.name||'',sheet:importContext.sheetName,importedAt:new Date().toISOString(),targetMonth:target.monthIndex0,targetYear:target.year}};
+        user.data[key]=nextDay;
+        calendarChanges.push({profile:userKey,dateKey:key,previous:previousByCell.get(`${userKey}|${key}`) || null,next:cloneJSON(nextDay)});
         written++;
       });
     });
     db.current=plan.resolvedNames.find(name=>db.users[name])||db.current;
     current=new Date(target.year,target.monthIndex0,1);
     saveDB();
-    addActivityLog('excel-import','Importación Excel completada',`${MONTHS[target.monthIndex0]} ${target.year}: ${written} celdas en ${plan.resolvedNames.length} perfil(es).`,{mode,written,cleared,mergeSkipped,invalidCodes,profiles:plan.resolvedNames,file:importContext.fileMeta?.name,backupId:backupStored?snapshot.id:null,detectedSource:importContext.detectedSource},'success');
+    recordCalendarDayChanges(calendarChanges,{type:'excel-import',actor:auditActor,source:`Excel: ${importContext.fileMeta?.name || 'archivo'}`});
     updateUserDropdown(); updateUserInitial(); updateMonthDisplay(); render(); renderSummaryCategories(); calcSummary();
     const info=document.getElementById('importInfo');
     if(info) info.innerHTML=`<div class="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-emerald-900"><div class="font-black text-[12px]">✅ Importación completada</div><div class="mt-1 text-[10px]">Destino: ${MONTHS[target.monthIndex0]} ${target.year} · Perfiles: ${plan.resolvedNames.length} · Celdas: ${written}${mergeSkipped?` · Omitidas: ${mergeSkipped}`:''}</div>${backupStored?'<div class="mt-1 text-[10px] font-black">Respaldo automático disponible en Historial.</div>':''}<button onclick="closeImportModalAndRefresh()" class="mt-3 px-4 py-2 bg-emerald-700 text-white rounded-xl font-black text-[10px]">Ver calendario</button></div>`;
@@ -6623,7 +6893,6 @@ function runImportSelected(){
   }catch(error){
     console.error('Error importando',error);
     try{ restoreImportSnapshot(snapshot,{log:false}); }catch(restoreError){ console.error('Error restaurando transacción',restoreError); }
-    addActivityLog('excel-import','Importación Excel revertida',error.message||String(error),{target,profiles:plan.resolvedNames},'error');
     alert(`La importación falló y se intentó restaurar el estado anterior: ${error.message||error}`);
   }finally{
     setImportBusy(false);
